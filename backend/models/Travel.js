@@ -26,6 +26,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.FLOAT(20),
         allowNull: false,
         comment: '여행 총 예산'
+      },
+      start_date: {
+        type: DataTypes.DATE(),
+        allowNull: false,
+        comment: '여행 시작일'
+      },
+      end_date: {
+        type: DataTypes.DATE(),
+        allowNull: false,
+        comment: '여행 종료일'
       }
     }, {
       tableName: 'Travel',
@@ -35,6 +45,8 @@ module.exports = (sequelize, DataTypes) => {
     });
     Travel.associate = function (models) {
       Travel.hasMany(models.User_Travel, { foreignKey: { name: 'travel_id', allowNull: false}});
+      Travel.belongsTo(models.Nation, { foreignKey: { name: 'nation_id', allowNull: false}});
+      Travel.hasMany(models.Schedule, { foreignKey: { name: 'travel_id', allowNull: false}});
     };
     return Travel;
   };

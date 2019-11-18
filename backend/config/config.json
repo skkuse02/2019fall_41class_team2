@@ -5,7 +5,7 @@
     "database": "eco_travel",
     "host": "sw-engineering.c49kvl9kv3wu.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
-    "operatorsAliases": false
+    "operatorsAliases": false,
   },
   "test": {
     "username": "admin",
@@ -13,7 +13,7 @@
     "database": "eco_travel",
     "host": "sw-engineering.c49kvl9kv3wu.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
-    "operatorsAliases": false
+    "operatorsAliases": false,
   },
   "production": {
     "username": "admin",
@@ -21,6 +21,6 @@
     "database": "eco_travel",
     "host": "sw-engineering.c49kvl9kv3wu.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
-    "operatorsAliases": false
+    "operatorsAliases": false,
   }
 }
