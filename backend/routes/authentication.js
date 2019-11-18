@@ -30,17 +30,15 @@ router.post('/login', wrap(async (req, res) => {
 }));
 
 router.post('/signup', wrap(async (req, res) => {
-  const user = await models.User.create({ // 유저 검색
+  const user = await models.User.create({ 
     userId: req.body.uid,
     password: req.body.password,
     nickname: req.body.nickname,
     name: req.body.name
   });
   if(user) {
-    delete req.body.password;
-    res.send({ // 로그인 결과 response
-      result: true,
-      data: user
+    res.send({
+      result: true
     });
   } else {
     res.send({
