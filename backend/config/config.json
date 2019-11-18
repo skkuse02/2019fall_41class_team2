@@ -6,6 +6,7 @@
     "host": "sw-engineering.c49kvl9kv3wu.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
     "operatorsAliases": false,
+    "timezone": "+09:00"
   },
   "test": {
     "username": "admin",
@@ -14,6 +15,7 @@
     "host": "sw-engineering.c49kvl9kv3wu.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
     "operatorsAliases": false,
+    "timezone": "+09:00"
   },
   "production": {
     "username": "admin",
@@ -22,5 +24,6 @@
     "host": "sw-engineering.c49kvl9kv3wu.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mysql",
     "operatorsAliases": false,
+    "timezone": "+09:00"
   }
 }
