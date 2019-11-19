@@ -1,7 +1,8 @@
 module.exports = (sequelize, DataTypes) => {
   const City = sequelize.define('City', {
     city_id: {
-      type: DataTypes.STRING(10),
+      type: DataTypes.INTEGER(5),
+      autoIncrement: true,
       allowNull: false,
       primaryKey: true,
       comment: '도시 아이디'
