@@ -30,12 +30,15 @@ router.post('/login', wrap(async (req, res) => {
 }));
 
 router.post('/signup', wrap(async (req, res) => {
+  console.log(req.body);
+  console.log(req.body.userId);
   const user = await models.User.create({ 
-    userId: req.body.uid,
+    userId: req.body.userId,
     password: req.body.password,
     nickname: req.body.nickname,
     name: req.body.name
   });
+  console.log(user);
   if(user) {
     res.send({
       result: true
