@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
 router.post('/login', wrap(async (req, res) => {
   const user = await models.User.findOne({ // 유저 검색
     where: {
-      userId: req.body.uid,
+      user_id: req.body.uid,
       password: req.body.password
     }
   });
@@ -30,13 +30,13 @@ router.post('/login', wrap(async (req, res) => {
 }));
 
 router.post('/signup', wrap(async (req, res) => {
-  console.log(req.body);
-  console.log(req.body.userId);
+  console.log(req.body)
   const user = await models.User.create({ 
-    userId: req.body.userId,
+    user_id: req.body.uid,
     password: req.body.password,
     nickname: req.body.nickname,
-    name: req.body.name
+    name: req.body.name,
+    authority: 1
   });
   console.log(user);
   if(user) {
