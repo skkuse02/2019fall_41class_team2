@@ -7,6 +7,8 @@ const colors = {
   white: "#FFFFFF",
   gray: "#9DA3B4",
   gray2: "#C5CCD6",
+  red: "#FF0000",
+  green: "#00FF00",
 };
 
 const sizes = {
@@ -20,6 +22,7 @@ const sizes = {
   h1: 26,
   h2: 20,
   h3: 18,
+  h5: 10,
   title: 18,
   header: 16,
   body: 14,
@@ -35,6 +38,9 @@ const fonts = {
   },
   h3: {
     fontSize: sizes.h3
+  },
+  h5: {
+    fontSize: sizes.h5
   },
   header: {
     fontSize: sizes.header

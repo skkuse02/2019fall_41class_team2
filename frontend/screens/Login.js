@@ -1,22 +1,20 @@
 import React, { Component } from 'react'
-import { ActivityIndicator, Keyboard, KeyboardAvoidingView, StyleSheet } from 'react-native'
+import { Alert, ActivityIndicator, Keyboard, StyleSheet, AsyncStorage } from 'react-native'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 import { Button, Block, Input, Text } from '../components';
 import { theme } from '../constants';
 
-const VALID_EMAIL = "contact@react-ui-kit.com";
-const VALID_PASSWORD = "subscribe";
-
 export default class Login extends Component {
   state = {
-    email: VALID_EMAIL,
-    password: VALID_PASSWORD,
+    email: null,
+    password: null,
     errors: [],
     loading: false,
   }
 
-  handleLogin() {
-    const { navigation } = this.props;
+  async handleLogin() {
+    const { navigate, state } = this.props.navigation;
     const { email, password } = this.state;
     const errors = [];
 
@@ -24,17 +22,48 @@ export default class Login extends Component {
     this.setState({ loading: true });
 
     // check with backend API or with some static data
-    if (email !== VALID_EMAIL) {
-      errors.push('email');
-    }
-    if (password !== VALID_PASSWORD) {
-      errors.push('password');
-    }
+    let url = 'http://192.168.0.37:3000/users/login';
+    let options = {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                })
+            };
+    let response = await fetch(url, options);
+    let responseOK = response && response.ok;
 
-    this.setState({ errors, loading: false });
+    if (responseOK) {
+        let data = await response.json();
+        this.setState({ errors, loading: false });
 
-    if (!errors.length) {
-      navigation.navigate("Browse");
+        if(data.result && !errors.length){
+          try {
+            await AsyncStorage.setItem('userToken', 'Logined');
+            navigate('AuthLoading');
+          } catch (error) {
+            // Error saving data
+            console.log(error);
+          }
+        }else{
+          Alert.alert(
+            '로그인 실패!',
+            '아이디 또는 비밀번호를 확인하세요',
+            [
+              {
+                text: 'OK', onPress: () => {
+                  navigate('SignUp', { go_back_key: state.key });
+                }
+              }
+            ],
+            { cancelable: false }
+          )
+        }
     }
   }
 
@@ -44,40 +73,42 @@ export default class Login extends Component {
     const hasErrors = key => errors.includes(key) ? styles.hasErrors : null;
 
     return (
-      <KeyboardAvoidingView style={styles.login} behavior="padding">
+      <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
         <Block padding={[0, theme.sizes.base * 2]}>
           <Text h1 bold>Login</Text>
           <Block middle>
             <Input
-              label="Email"
+              label="아이디"
               error={hasErrors('email')}
               style={[styles.input, hasErrors('email')]}
+              placeholder={"아이디를 입력해주세요"}
               defaultValue={this.state.email}
               onChangeText={text => this.setState({ email: text })}
             />
             <Input
               secure
-              label="Password"
+              label="비밀번호"
               error={hasErrors('password')}
               style={[styles.input, hasErrors('password')]}
+              placeholder={"비밀번호를 입력해주세요"}
               defaultValue={this.state.password}
               onChangeText={text => this.setState({ password: text })}
             />
             <Button gradient onPress={() => this.handleLogin()}>
               {loading ?
                 <ActivityIndicator size="small" color="white" /> : 
-                <Text bold white center>Login</Text>
+                <Text bold white center>로그인</Text>
               }
             </Button>
 
             <Button onPress={() => navigation.navigate('Forgot')}>
               <Text gray caption center style={{ textDecorationLine: 'underline' }}>
-                Forgot your password?
+                비밀번호 찾기
               </Text>
             </Button>
           </Block>
         </Block>
-      </KeyboardAvoidingView>
+      </KeyboardAwareScrollView>
     )
   }
 }

@@ -4,6 +4,9 @@ import { Animated, Dimensions, Image, FlatList, Modal, StyleSheet, ScrollView } 
 import { Button, Block, Text } from '../components';
 import { theme } from '../constants';
 
+import axios from "axios";
+import Gio from 'react-giojs';
+
 const { width, height } = Dimensions.get('window');
 
 class Welcome extends Component {
@@ -83,8 +86,8 @@ class Welcome extends Component {
         renderItem={({ item }) => (
           <Image
             source={item.source}
-            resizeMode="contain"
-            style={{ width, height: height / 2, overflow: 'visible' }}
+            resizeMode="cover"
+            style={{ width, height: height / 2 - 20, overflow: 'visible' }}
           />
         )}
         onScroll={
@@ -121,19 +124,45 @@ class Welcome extends Component {
       </Block>
     )
   }
+
   
   render() {
     const { navigation } = this.props;
+    var configs = {
+      width: 400,
+      height: 400,
+      control: {
+              stats: false,
+              disableUnmentioned: false,
+              lightenMentioned: false,
+              inOnly: false,
+              outOnly: false,
+              initCountry: "CN",
+              halo: true
+      },
+      color: {
+              surface: 0xFFFFFF,
+              selected: null,
+              in: 0x154492,
+              out: 0xDD380C,
+              halo: 0xFFFFFF,
+              background: null
+      },
+      brightness: {
+              ocean: 0.5,
+              mentioned: 0.5,
+              related: 0.5
+      }
+    }
 
     return (
       <Block>
         <Block center bottom flex={0.4}>
           <Text h1 center bold>
-            Your Home.
-            <Text h1 primary> Greener.</Text>
+            <Text h1 primary> Eco-Travel</Text>
           </Text>
-          <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2 }}>
-            Enjoy the experience.
+          <Text h3 gray2 style={{ marginTop: theme.sizes.padding / 2, marginBottom: 20}}>
+            여행을 떠날 준비가 다 되셨나요?
           </Text>
         </Block>
         <Block center middle>
@@ -159,9 +188,9 @@ class Welcome extends Component {
 
 Welcome.defaultProps = {
   illustrations: [
-    { id: 1, source: require('../assets/images/illustration_1.png') },
-    { id: 2, source: require('../assets/images/illustration_2.png') },
-    { id: 3, source: require('../assets/images/illustration_3.png') },
+    { id: 1, source: require('../assets/images/welcome_3.jpg') },
+    { id: 2, source: require('../assets/images/welcome_2.jpg') },
+    { id: 3, source: require('../assets/images/welcome_1.jpg') },
   ],
 };
 

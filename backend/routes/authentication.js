@@ -9,10 +9,11 @@ router.get('/', function(req, res, next) {
   res.send('respond with a resource');
 });
 
-router.post('/login', wrap(async (req, res) => {
+router.post('/login', async (req, res) => {
+  console.log(req.body);
   const user = await models.User.findOne({ // 유저 검색
     where: {
-      user_id: req.body.uid,
+      user_id: req.body.email,
       password: req.body.password
     }
   });
@@ -27,18 +28,50 @@ router.post('/login', wrap(async (req, res) => {
       result: false
     });
   }
-}));
+});
+
+router.post('/idDuplicationCheck', async (req, res) =>{
+  const user = await models.User.findOne({
+    where: {
+      user_id: req.body.email
+    }
+  });
+  if(user){
+    res.send({
+      result: true
+    });
+  } else{
+    res.send({
+      result: false
+    });
+  }
+});
+
+router.post('/nicknameDuplicationCheck', async (req, res) =>{
+  const user = await models.User.findOne({
+    where: {
+      nickname: req.body.nickname
+    }
+  });
+  if(user){
+    res.send({
+      result: true
+    });
+  } else{
+    res.send({
+      result: false
+    });
+  }
+});
 
 router.post('/signup', wrap(async (req, res) => {
-  console.log(req.body)
   const user = await models.User.create({ 
-    user_id: req.body.uid,
+    user_id: req.body.email,
     password: req.body.password,
+    name: req.body.username,
     nickname: req.body.nickname,
-    name: req.body.name,
     authority: 1
   });
-  console.log(user);
   if(user) {
     res.send({
       result: true
