@@ -12,6 +12,7 @@ import Product from '../screens/Product';
 import Settings from '../screens/Settings';
 
 import AuthLoading from '../screens/AuthLoading';
+import Receipt from '../screens/Receipt';
 
 import { theme } from '../constants';
 
@@ -25,6 +26,7 @@ const screens = createStackNavigator({
   Browse,
   Product,
   Settings,
+  Receipt,
 }, {
   defaultNavigationOptions: {
     headerStyle: {

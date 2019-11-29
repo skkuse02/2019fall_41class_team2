@@ -60,6 +60,9 @@ class Browse extends Component {
               style={styles.avatar}
             />
           </Button>
+          <Button onPress={() => navigation.navigate('Receipt')}>
+            <Text>Receipt</Text>
+          </Button>
         </Block>
 
         <Block flex={false} row style={styles.tabs}>
