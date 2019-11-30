@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { Dimensions, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 
 import { Card, Badge, Button, Block, Text } from '../components';
 import { theme, mocks } from '../constants';
@@ -90,6 +90,11 @@ class Browse extends Component {
             ))}
           </Block>
         </ScrollView>
+        <Block style={styles.cen}>
+          <Button gradient onPress={() => navigation.navigate('AddTravel')} style={styles.but}>
+            <Text bold white center>+</Text>
+          </Button>
+        </Block>
       </Block>
     )
   }
@@ -134,5 +139,15 @@ const styles = StyleSheet.create({
     minWidth: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
     maxWidth: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
     maxHeight: (width - (theme.sizes.padding * 2.4) - theme.sizes.base) / 2,
+  },
+  but: {
+    borderRadius: 70,
+    aspectRatio: 1
+  },
+  cen: {
+    alignItems: 'center',
+    position: "absolute",
+    left: 181,
+    top: 650
   }
 })

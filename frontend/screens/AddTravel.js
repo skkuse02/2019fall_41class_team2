@@ -97,7 +97,7 @@ export default class Login extends Component {
             <Button gradient onPress={() => this.handleLogin()}>
               {loading ?
                 <ActivityIndicator size="small" color="white" /> : 
-                <Text bold white center>로그인</Text>
+                <Text bold white center>addd</Text>
               }
             </Button>
 

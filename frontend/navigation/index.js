@@ -11,6 +11,7 @@ import Browse from '../screens/Browse';
 import Product from '../screens/Product';
 import Settings from '../screens/Settings';
 
+import AddTravel from '../screens/AddTravel';
 import AuthLoading from '../screens/AuthLoading';
 import Receipt from '../screens/Receipt';
 
@@ -27,6 +28,7 @@ const screens = createStackNavigator({
   Product,
   Settings,
   Receipt,
+  AddTravel,
 }, {
   defaultNavigationOptions: {
     headerStyle: {
