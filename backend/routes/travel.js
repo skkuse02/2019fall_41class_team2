@@ -4,27 +4,6 @@ var router = express.Router();
 const wrap = require('express-async-wrap');
 const models = require('../models');
 
-router.post('/login', async (req, res) => {
-  console.log(req.body);
-  const user = await models.User.findOne({ // 유저 검색
-    where: {
-      user_id: req.body.email,
-      password: req.body.password
-    }
-  });
-  if(user) {
-    delete req.body.password;
-    res.send({ // 로그인 결과 response
-      result: true,
-      data: user
-    });
-  } else {
-    res.send({
-      result: false
-    });
-  }
-});
-
 router.post('/addTravel', wrap(async (req, res) => {
   console.log(req.body)
   const travel = await models.Travel.create({ 
@@ -45,5 +24,20 @@ router.post('/addTravel', wrap(async (req, res) => {
     });
   }
 }));
+
+router.post('/addNation', wrap(async (req, res) => {
+  const cities = await models.City.findAll({
+    where: {
+      capital: 'primary'
+    }
+  });
+  for (let i = 0; i < cities.length; i += 1) {
+    const nation = await models.Nation.create({
+      name: cities[i].country,
+      latitude: cities[i].latitude,
+      longitude: cities[i].longitude,
+    });
+  }
+}))
 
 module.exports = router;
