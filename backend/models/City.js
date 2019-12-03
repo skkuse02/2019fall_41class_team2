@@ -22,6 +22,16 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       comment: '도시 경도'
     },
+    country: {
+      type: DataTypes.STRING(30),
+      allowNull: false,
+      comment: '나라 이름'
+    },
+    capital: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+      comment: '수도 여부'
+    },
   }, {
     tableName: 'City',
     comment: '도시',
