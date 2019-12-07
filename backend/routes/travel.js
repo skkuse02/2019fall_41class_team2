@@ -15,10 +15,15 @@ router.post('/addTravel', wrap(async (req, res) => {
     end_date: req.body.end_date,
     nation_id: parseInt(req.body.country)
   });
+  
   if(travel) {
-    res.send({
-      result: true
-    });
+    const ids = req.body.invite.split(',')
+    console.log(ids)
+    console.log(travel)
+    const invite = await models.User_Travel.create({
+      travel_id: travel.travel_id,
+      user_id: ids[ids.length - 1]
+    })
   } else {
     res.send({
       result: false
@@ -45,7 +50,6 @@ router.get('/getNation', wrap(async (req, res) => {
   const nation = await models.Nation.findAll({
     attributes: ['nation_id', 'name']
   });
-  console.log(nation)
   if(nation) {
     res.send({
       result: nation,
