@@ -19,10 +19,14 @@ router.post('/addTravel', wrap(async (req, res) => {
   if(travel) {
     const ids = req.body.invite.split(',')
     console.log(ids)
-    console.log(travel)
-    const invite = await models.User_Travel.create({
-      travel_id: travel.travel_id,
-      user_id: ids[ids.length - 1]
+    for(let i = 0; i < ids.length; i++){
+      const invite = await models.User_Travel.create({
+        travel_id: travel.travel_id,
+        user_id: ids[i]
+      })
+    }
+    res.send({
+      result: true
     })
   } else {
     res.send({
@@ -60,6 +64,46 @@ router.get('/getNation', wrap(async (req, res) => {
       result: false
     });
   }
+}))
+
+router.get('/getTravel/:uid', wrap(async (req, res) => {
+  console.log(req.params.uid)
+  const list = await models.User_Travel.findAll({
+    where: {
+      user_id: req.params.uid
+    },
+    order: [
+      ['travel_id', 'DESC']
+    ]
+  });
+  let travels = []
+  if(list){
+    for( let i = 0; i < list.length; i++){
+      const travel = await models.Travel.findOne({
+        where: {
+          travel_id: list[i].travel_id
+        }
+      })
+      travels.push(travel)
+    }
+    console.log(travels)
+    if(travels) {
+      res.send({
+        result: true,
+        data: travels
+      });
+    } else {
+      res.send({
+        result: false
+      });
+    }
+  } else {
+    res.send({
+      result: false,
+      data: 'No data'
+    })
+  }
+  
 }))
 
 module.exports = router;
