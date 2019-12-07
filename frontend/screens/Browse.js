@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Dimensions, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { Dimensions, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity, AsyncStorage } from 'react-native'
 
 import { Card, Badge, Button, Block, Text } from '../components';
 import { theme, mocks } from '../constants';
@@ -8,21 +8,92 @@ const { width } = Dimensions.get('window');
 
 class Browse extends Component {
   state = {
-    active: 'Products',
+    active: 'Family',
     categories: [],
+    travels: [],
+    now: []
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     this.setState({ categories: this.props.categories });
+    console.log(this.props.categories)
+    console.log(this.props)
+    let uid = await AsyncStorage.getItem('uid')
+    let url = `http://b87ee120.ngrok.io/travel/getTravel/${uid}`;
+    let options = {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                  
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
+            };
+    let response = await fetch(url, options);
+    
+    //console.log(response.data)
+    let responseOK = response && response.ok;
+    let travels = []
+    if (responseOK){
+      let resJson = await response.json()
+      let data = resJson.data
+      console.log(response)
+      console.log(data)
+      for(i = 0; i < data.length ; i++){
+        let travel = {}
+        if(data[i].category == 'fri'){
+          travel = {
+            id: data[i].title,
+            name: data[i].title,
+            tags: ['Friend'],
+            content: data[i].content
+          }
+        } else if (data[i].category == 'fam'){
+          travel = {
+            id: data[i].title,
+            name: data[i].title,
+            tags: ['Family'],
+            content: data[i].content
+          }
+        } else if (data[i].category == 'alo'){
+          travel = {
+            id: data[i].title,
+            name: data[i].title,
+            tags: ['Alone'],
+            content: data[i].content
+          }
+        } else{
+          travel = {
+            id: data[i].title,
+            name: data[i].title,
+            tags: ['Couple'],
+            content: data[i].content
+          }
+        }
+        
+        travels.push(travel);
+      }
+      console.log(travels)
+      const filtered = travels.filter(
+        travel => travel.tags.includes('Family')
+      );
+
+      this.setState({travels: travels, now: filtered})
+    }
   }
 
   handleTab = tab => {
     const { categories } = this.props;
-    const filtered = categories.filter(
-      category => category.tags.includes(tab.toLowerCase())
+    const { travels, now } = this.state;
+    // const filtered = categories.filter(
+    //   category => category.tags.includes(tab.toLowerCase())
+    // );
+    console.log(travels)
+    const filtered = travels.filter(
+      travel => travel.tags.includes(tab)
     );
 
-    this.setState({ active: tab, categories: filtered });
+    this.setState({ active: tab, now: filtered });
   }
 
   renderTab(tab) {
@@ -47,8 +118,8 @@ class Browse extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { categories } = this.state;
-    const tabs = ['Products', 'Inspirations', 'Shop'];
+    const { categories, travels, now } = this.state;
+    const tabs = ['Family', 'Couple', 'Alone', 'Friend'];
 
     return (
       <Block>
@@ -74,17 +145,17 @@ class Browse extends Component {
           style={{ paddingVertical: theme.sizes.base * 2}}
         >
           <Block flex={false} row space="between" style={styles.categories}>
-            {categories.map(category => (
+            {now.map(now_each => (
               <TouchableOpacity
-                key={category.name}
+                key={now_each.name}
                 onPress={() => navigation.navigate('Explore', { category })}
               >
                 <Card center middle shadow style={styles.category}>
                   <Badge margin={[0, 0, 15]} size={50} color="rgba(41,216,143,0.20)">
-                    <Image source={category.image} />
+                    <Image source={now_each.image} />
                   </Badge>
-                  <Text medium height={20}>{category.name}</Text>
-                  <Text gray caption>{category.count} products</Text>
+                  <Text medium height={20}>{now_each.name}</Text>
+                  <Text gray caption>{now_each.content} products</Text>
                 </Card>
               </TouchableOpacity>
             ))}
