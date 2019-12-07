@@ -67,7 +67,6 @@ router.get('/getNation', wrap(async (req, res) => {
 }))
 
 router.get('/getTravel/:uid', wrap(async (req, res) => {
-  console.log(req.params.uid)
   const list = await models.User_Travel.findAll({
     where: {
       user_id: req.params.uid
@@ -82,11 +81,13 @@ router.get('/getTravel/:uid', wrap(async (req, res) => {
       const travel = await models.Travel.findOne({
         where: {
           travel_id: list[i].travel_id
-        }
+        },
+        include: [
+          { model: models.Nation}
+        ]
       })
       travels.push(travel)
     }
-    console.log(travels)
     if(travels) {
       res.send({
         result: true,
