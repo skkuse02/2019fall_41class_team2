@@ -24,6 +24,12 @@ class Explore extends Component {
     ).start();
   }
 
+  async componentDidMount(){
+    const { navigation } = this.props;
+    const browse = navigation.getParam('browse', 'no Browse data');
+    console.log(browse)
+  }
+
   renderSearch() {
     const { searchString, searchFocus } = this.state;
     const isEditing = searchFocus && searchString;
@@ -105,6 +111,8 @@ class Explore extends Component {
   }
 
   render() {
+    const { navigation } = this.props;
+    const browse = navigation.getParam('browse', 'no Browse data');
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>

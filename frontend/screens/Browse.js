@@ -64,7 +64,8 @@ class Browse extends Component {
             name: data[i].title,
             tags: ['Friend'],
             content: data[i].content,
-            img: `https://www.countryflags.io/${code}/flat/64.png`
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
           }
         } else if (data[i].category == 'fam'){
           travel = {
@@ -72,7 +73,8 @@ class Browse extends Component {
             name: data[i].title,
             tags: ['Family'],
             content: data[i].content,
-            img: `https://www.countryflags.io/${code}/flat/64.png`
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
           }
         } else if (data[i].category == 'alo'){
           travel = {
@@ -80,7 +82,8 @@ class Browse extends Component {
             name: data[i].title,
             tags: ['Alone'],
             content: data[i].content,
-            img: `https://www.countryflags.io/${code}/flat/64.png`
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
           }
         } else{
           travel = {
@@ -88,7 +91,8 @@ class Browse extends Component {
             name: data[i].title,
             tags: ['Couple'],
             content: data[i].content,
-            img: `https://www.countryflags.io/${code}/flat/64.png`
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
           }
         }
         
@@ -169,7 +173,7 @@ class Browse extends Component {
             {now.map(now_each => (
               <TouchableOpacity
                 key={now_each.name}
-                onPress={() => navigation.navigate('Explore', { category })}
+                onPress={() => navigation.navigate('Explore', { browse: now_each.data })}
               >
                 <Card center middle shadow style={styles.category}>
                   <Badge margin={[0, 0, 15]} size={60} color="rgba(41,216,143,0.20)">
