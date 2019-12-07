@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Dimensions, View, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { Dimensions, View, ActivityIndicator, Image, StyleSheet, ScrollView, TouchableOpacity, AsyncStorage } from 'react-native'
 
 import { Card, Badge, Button, Block, Text, TextInput, Platform, Input } from '../components';
 import { theme, mocks } from '../constants';
 import RNpickerSelect from 'react-native-picker-select'
 import DatePicker from 'react-native-datepicker'
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 const { width } = Dimensions.get('window');
 
@@ -19,15 +20,17 @@ class Browse extends Component {
     end_date: '',
     loading: false,
     country: '',
-    nation: []
+    nation: [],
+    invite: ''
   }
 
   async addTravel() {
     const { navigate, state } = this.props.navigation;
-    const { title, content, category, total_budget, start_date, end_date, country, nation } = this.state;
+    const { title, content, category, total_budget, start_date, end_date, country, nation, invite } = this.state;
     const errors = [];
-    console.log(this.state)
-    let url = 'http://1a69be53.ngrok.io/travel/addTravel';
+    let uid = await AsyncStorage.getItem('uid')
+    let tmp = invite +',' + uid
+    let url = 'http://b87ee120.ngrok.io/travel/addTravel';
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -42,7 +45,8 @@ class Browse extends Component {
                   total_budget: total_budget,
                   start_date: start_date,
                   end_date: end_date,
-                  country: country
+                  country: country,
+                  invite: tmp
                 })
             };
     let response = await fetch(url, options);
@@ -64,7 +68,7 @@ class Browse extends Component {
     if (responseOK) {
         let data = await response.json();
         this.setState({ errors, loading: false });
-        console.log(date)
+        console.log(data)
         navigate('Browse', { go_back_key: state.key });
     }
   }
@@ -91,7 +95,7 @@ class Browse extends Component {
   }
 
   async componentDidMount() {
-    let url = 'http://1a69be53.ngrok.io/travel/getNation';
+    let url = 'http://b87ee120.ngrok.io/travel/getNation';
     let options = {
                 method: 'GET',
                 mode: 'cors',
@@ -111,10 +115,12 @@ class Browse extends Component {
       let data = resJson.data
       console.log(response)
       console.log(data[0])
-      for(i = 0; i < 10 ; i++){
-        nation.push({'label': data[i].name, 'value': String(data[i].nation_id)});
+      for(i = 0; i < data.length ; i++){
+        if(i > 0){
+          if(data[i - 1].name != data[i].name)
+            nation.push({'label': data[i].name, 'value': String(data[i].nation_id), 'color': '#000000'});
+        }        
       }
-      console.log(nation)
       this.setState({nation: nation})
     }
   }
@@ -182,15 +188,16 @@ class Browse extends Component {
       color: '#9EA0A4'
     }
     return (
-      <Block padding={[0, theme.sizes.base * 2]}>
+      <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
+        <Block padding={[0, theme.sizes.base * 2]}>
           <Text h1 bold>Add Travel</Text>
           <RNpickerSelect
             placeholder={placeholder}
             style={{marginTop: 30}}
-            onValueChange={value => {console.log(this.state); console.log(value);
+            onValueChange={value => {console.log(value);
               this.setState({
               category: value,
-            }); console.log(this.state); console.log(value)}}
+            }); console.log(value)}}
             items={[
                 { label: '가족과', value: 'fam' },
                 { label: '연인과', value: 'cou' },
@@ -230,10 +237,10 @@ class Browse extends Component {
           <RNpickerSelect
             placeholder={placeholderBudget}
             style={{marginBottom: 50}}
-            onValueChange={value => {console.log(this.state); console.log(value);
+            onValueChange={value => {console.log(value);
               this.setState({
               country: value,
-            }); console.log(this.state); console.log(value)}}
+            }); console.log(value)}}
             items={this.state.nation}
             // onUpArrow={() => {
             //   this.state.category.focus();
@@ -245,6 +252,12 @@ class Browse extends Component {
             value={this.state.country}
             //itemKey={this.state.country}
             
+          />
+          <Input
+            style={styles.input}
+            placeholder={"함께 가는 사람(id1,id2)"}
+            defaultValue={this.state.invite}
+            onChangeText={text => this.setState({ invite: text })}
           />
           <DatePicker
             style={{width: 200, marginLeft: 65, marginBottom: 30, marginTop: 30}}
@@ -294,6 +307,7 @@ class Browse extends Component {
             }}
             onDateChange={(date) => {this.setState({end_date: date})}}
           />
+          
           <Button gradient onPress={() => this.addTravel()}>
             {loading ?
               <ActivityIndicator size="small" color="white" /> : 
@@ -301,6 +315,7 @@ class Browse extends Component {
             }
           </Button>
         </Block>
+      </KeyboardAwareScrollView>
     )
   }
 }
