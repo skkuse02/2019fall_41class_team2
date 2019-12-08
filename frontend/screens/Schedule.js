@@ -55,11 +55,10 @@ class Explore extends Component {
     let response = await fetch(url, options);
     
     let responseOK = response && response.ok;
-    let nation = []
     if (responseOK){
       let resJson = await response.json()
       let data = resJson.data
-      console.log(response)
+      console.log(resJson)
       console.log(data[0])
       this.setState({data: data, loading: false})
     }

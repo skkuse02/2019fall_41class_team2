@@ -139,7 +139,7 @@ class Explore extends Component {
             onPress={() => this.TimePicker.open()}            
             
           >
-            <TextInput style={{width: 100, marginTop: -10}} placeholder={"시각"} editable = {false}>
+            <TextInput style={{width: 100, marginTop: -9}} placeholder={"시각"} editable = {false}>
               {this.state.start_time}
             </TextInput>
           </TouchableOpacity>
