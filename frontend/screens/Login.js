@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Alert, ActivityIndicator, Keyboard, StyleSheet, AsyncStorage } from 'react-native'
+import { Alert, ActivityIndicator, Keyboard, StyleSheet, AsyncStorage, Image } from 'react-native'
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 import { Button, Block, Input, Text } from '../components';
@@ -22,7 +22,7 @@ export default class Login extends Component {
     this.setState({ loading: true });
 
     // check with backend API or with some static data
-    let url = 'http://8a478d15.ngrok.io/users/login';
+    let url = 'http://8f752f41.ngrok.io/users/login';
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -45,6 +45,11 @@ export default class Login extends Component {
         if(data.result && !errors.length){
           try {
             await AsyncStorage.setItem('userToken', 'Logined');
+            await AsyncStorage.setItem('uid', email);
+            let tmp = await AsyncStorage.getAllKeys();
+            console.log(tmp)
+            let t = await AsyncStorage.getItem('uid')
+            console.log(t)
             navigate('AuthLoading');
           } catch (error) {
             // Error saving data
@@ -100,12 +105,11 @@ export default class Login extends Component {
                 <Text bold white center>로그인</Text>
               }
             </Button>
-
             <Button onPress={() => navigation.navigate('Forgot')}>
               <Text gray caption center style={{ textDecorationLine: 'underline' }}>
                 비밀번호 찾기
               </Text>
-            </Button>
+            </Button>            
           </Block>
         </Block>
       </KeyboardAwareScrollView>

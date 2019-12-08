@@ -19,7 +19,7 @@ class Browse extends Component {
     console.log(this.props.categories)
     console.log(this.props)
     let uid = await AsyncStorage.getItem('uid')
-    let url = `http://b87ee120.ngrok.io/travel/getTravel/${uid}`;
+    let url = `http://8f752f41.ngrok.io/travel/getTravel/${uid}`;
     let options = {
                 method: 'GET',
                 mode: 'cors',
