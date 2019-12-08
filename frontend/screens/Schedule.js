@@ -10,9 +10,20 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 const { width, height } = Dimensions.get('window');
 
 function Item({schedule}){
+  console.log("item")
+  //console.log(this.props)
+  //const { navigation } = this.props;
   return (
-    <View style={styles.item}>
-      <Text>{schedule.date}</Text>
+    <View>
+      <TouchableOpacity style={styles.item} onPress={() => this.onSelect()}>
+        <Text>{schedule.date}일</Text>
+        {schedule.sche.length > 0?
+          <Text>{schedule.sche}스케</Text>:
+          <Text>No data</Text>
+        }
+        
+      </TouchableOpacity>
+      
     </View>
   );
 }
@@ -63,10 +74,16 @@ class Explore extends Component {
     this.getSchedule();
   }
   
+  constructor(props) {
+    super(props);
+
+    console.log(this.props)
+  }
+
   async getSchedule() {    
     const { travel_id, sday, eday } = this.state;
     console.log(this.state)
-    let url = `http://8f752f41.ngrok.io/schedule/getSchedule/${travel_id}`;
+    let url = `http://a10cff1f.ngrok.io/schedule/getSchedule/${travel_id}`;
     
     let options = {
                 method: 'GET',
@@ -94,6 +111,11 @@ class Explore extends Component {
   // onRefresh = () => {
   //   this.getSchedule();
   // }
+  onSelect(){
+    console.log("select")
+    const { navigation } = this.props;
+    navigation.navigate('Explore', { browse: schedule })
+  }
 
   render() {
     const { navigation } = this.props;
@@ -111,18 +133,27 @@ class Explore extends Component {
         </View>
           <FlatList
             data={schedule}
-            initialNumToRender={20}
-            refreshing={this.state.refreshing}
-            onRefresh={this.onRefresh}
-            renderItem={({ item }) => <Item schedule = {item} />}
-            keyExtractor={item => item.date}
-          />
-        <Button gradient onPress={() => this.addSchedule()}>
-          {loading ?
-            <ActivityIndicator size="small" color="white" /> : 
-            <Text bold white center>추가하기</Text>
-          }
-        </Button>       
+            //initialNumToRender={20}
+            //refreshing={this.state.refreshing}
+            //onRefresh={this.onRefresh}
+            renderItem={({ item }) => {
+              return (
+                <View>
+                  <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Explore', { browse: item, obj: this.state })}>
+                    <Text>{item.date}일</Text>
+                    {item.sche.length > 0?
+                      <Text>{item.sche}스케</Text>:
+                      <Text>No data</Text>
+                    }
+                    
+                  </TouchableOpacity>
+                  
+                </View>
+              );
+            }}
+            keyExtractor={item => toString(item.date)}
+            //onPress={()=> navigation.navigate('Explore', { browse: schedule })}
+          />    
       </Block>
       </KeyboardAwareScrollView>
     )
