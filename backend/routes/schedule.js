@@ -91,4 +91,19 @@ router.get('/getTravel/:uid', wrap(async (req, res) => {
   
 }))
 
+router.get('/getCity', wrap(async (req, res) => {
+  console.log("get city")
+  const city = await models.City.findAll();
+  if(city) {
+    res.send({
+      result: true,
+      data: city
+    });
+  } else {
+    res.send({
+      result: false
+    });
+  }
+}))
+
 module.exports = router;
