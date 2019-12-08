@@ -54,7 +54,7 @@ class Explore extends Component {
     let response = await fetch(url, options);
     
     let responseOK = response && response.ok;
-    let city = []
+    let cities = []
     if (responseOK){
       let resJson = await response.json()
       let data = resJson.data
@@ -62,10 +62,10 @@ class Explore extends Component {
       for(i = 0; i < data.length ; i++){
         ////if(i > 0){
           //if(data[i - 1].name != data[i].name)
-            city.push({'tagId': data[i].city_id, 'title': data[i].name, 'color': '#000000'});
+            cities.push({'tagId': data[i].city_id, 'title': data[i].name, 'color': '#000000'});
         //}        
       }
-      this.setState({city: city})
+      await this.setState({city: cities})
     }
     //this.setState({travel_id: browse.travel_id})
     this.getSchedule();
@@ -83,10 +83,7 @@ class Explore extends Component {
                   
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8'
-                },
-                body: JSON.stringify({
-                  travel_id: travel_id
-                })
+                }
             };
     let response = await fetch(url, options);
     
@@ -187,7 +184,7 @@ class Explore extends Component {
           defaultValue={this.state.content}
           onChangeText={text => this.setState({ content: text })}
         />
-        
+        <View style={styles.blo2}>
           <View style={styles.drop}>
             <SearchableDropDown
               style={styles.dropItem}
@@ -200,7 +197,7 @@ class Explore extends Component {
               items={this.state.city}
               defaultIndex={0}
               resetValue={false}
-              placeholder={'type something...'}
+              placeholder={'여행 도시'}
               placeholderTextColor={'gray'}
               underlineColorAndroid="transparent"
             />
@@ -218,6 +215,7 @@ class Explore extends Component {
               {this.state.start_time}
             </TextInput>
           </TouchableOpacity>
+        </View>
         <Button gradient onPress={() => this.addSchedule()}>
           {loading ?
             <ActivityIndicator size="small" color="white" /> : 
@@ -357,6 +355,9 @@ const styles = StyleSheet.create({
   blo: {
     height: 80,
     width: 400,
+    flexDirection: 'row'
+  },
+  blo2: {
     flexDirection: 'row'
   }
 })
