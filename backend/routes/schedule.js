@@ -31,29 +31,17 @@ router.post('/addSchedule', wrap(async (req, res) => {
   }
 }));
 
-router.post('/addNation', wrap(async (req, res) => {
-  const cities = await models.City.findAll({
+router.get('/getSchedule/:tid', wrap(async (req, res) => {
+  console.log("get sh")
+  const schedule = await models.Schedule.findAll({
     where: {
-      capital: 'primary'
+      travel_id: req.params.tid
     }
   });
-  for (let i = 0; i < cities.length; i += 1) {
-    const nation = await models.Nation.create({
-      name: cities[i].country,
-      latitude: cities[i].latitude,
-      longitude: cities[i].longitude,
-    });
-  }
-}))
-
-router.get('/getNation', wrap(async (req, res) => {
-  const nation = await models.Nation.findAll({
-    attributes: ['nation_id', 'name']
-  });
-  if(nation) {
+  if(schedule) {
     res.send({
-      result: nation,
-      data: nation
+      result: true,
+      data: schedule
     });
   } else {
     res.send({
