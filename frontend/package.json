@@ -12,6 +12,7 @@
     "react": "16.8.3",
     "react-giojs": "0.0.5",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
+    "react-native-24h-timepicker": "^1.1.0",
     "react-native-datepicker": "^1.7.2",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",
     "react-native-picker-select": "^6.3.3",
