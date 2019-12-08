@@ -151,7 +151,7 @@ class Explore extends Component {
                 </View>
               );
             }}
-            keyExtractor={item => toString(item.date)}
+            keyExtractor={item => item.date.toString()}
             //onPress={()=> navigation.navigate('Explore', { browse: schedule })}
           />    
       </Block>
