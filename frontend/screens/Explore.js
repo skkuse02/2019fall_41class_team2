@@ -14,9 +14,18 @@ class Explore extends Component {
     travel_id: '',
     data: [],
   };
+
+  async componentDidMount(){
+    const { navigation } = this.props;
+    const browse = navigation.getParam('browse', 'no Browse data');
+    console.log(browse)
+    this.setState({travel_id: browse.travel_id})
+    this.getSchedule();
+  }
   
   async getSchedule() {
-    let url = 'http://6eaec575.ngrok.io/schedule/getSchedule';
+    console.log("get")
+    let url = 'http://8f752f41.ngrok.io/schedule/getSchedule';
     this.setState({ loading: true });
     const { travel_id } = this.state;
     let options = {
@@ -51,11 +60,12 @@ class Explore extends Component {
   render() {
     const { navigation } = this.props;
     const browse = navigation.getParam('browse', 'no Browse data');
-    this.setState({ travel_id: browse });
     return (
       <Block>
-        <Block flex={false} row center space="between" style={styles.header}>
+        <Block flex={false} space="between" style={styles.header}>
           <Text h1 bold>{browse.title}</Text>
+          <Text h3>{browse.content}</Text>
+          <Text h4>{browse.start_date.slice(0, 10)} ~ {browse.end_date.slice(0, 10)}{"\n"}</Text>
         </Block>
           <FlatList
             data={this.state.data}
