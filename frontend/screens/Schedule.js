@@ -9,11 +9,19 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 
 const { width, height } = Dimensions.get('window');
 
+function Item({schedule}){
+  return (
+    <View style={styles.item}>
+      <Text>{schedule.date}</Text>
+    </View>
+  );
+}
+
 class Explore extends Component {
   state = {
     refreshing: false,
     loading: false,
-    travel_id: '',
+    travel_id: 0,
     data: [],
     //schedule: {
       title: '',
@@ -24,23 +32,40 @@ class Explore extends Component {
       start_time: '',
       end_time: '',
       date: '',
-      travel_id: 0,
-      city_id: 0
+      city_id: 0,
     //}
+    sday: 0,
+    eday: 0,
+    schedule: []
   };
 
   async componentDidMount(){
     const { navigation } = this.props;
     const browse = navigation.getParam('browse', 'no Browse data');
     console.log(browse)
-    this.setState({travel_id: browse.travel_id})
+    await this.setState({travel_id: parseInt(browse.travel_id)})
+    let sday = parseInt(browse.start_date.slice(8,10))
+    let eday = parseInt(browse.end_date.slice(8,10))
+    let day = eday - sday + 1
+    console.log(sday, eday, day)
+    let sche = []
+    let obj = {}
+
+    for(let i = 0; i < day; i++){
+      //obj[sday+i] = []
+      sche.push({
+        date: sday+i,
+        sche: []
+      })
+    }
+    //sche.push(obj)
+    await this.setState({schedule: sche, sday: sday, eday: eday})
     this.getSchedule();
   }
   
-  async getSchedule() {
-    console.log("get")
-    
-    const { travel_id } = this.state;
+  async getSchedule() {    
+    const { travel_id, sday, eday } = this.state;
+    console.log(this.state)
     let url = `http://8f752f41.ngrok.io/schedule/getSchedule/${travel_id}`;
     
     let options = {
@@ -58,51 +83,12 @@ class Explore extends Component {
     if (responseOK){
       let resJson = await response.json()
       let data = resJson.data
-      console.log(resJson)
-      console.log(data[0])
+      console.log(data)
+      for(let i = 0; i < data.length; i++){
+
+      }
       this.setState({data: data, loading: false})
     }
-  }
-
-  async addSchedule() {
-    const {schedule} = this.state
-    console.log("add")
-    console.log(schedule)
-    let url = 'http://8f752f41.ngrok.io/schedule/addSchedule';
-    this.setState({ loading: true });
-    const { travel_id } = this.state;
-    let options = {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                  
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json;charset=UTF-8'
-                },
-                body: JSON.stringify({
-                  travel_id: travel_id
-                })
-            };
-    let response = await fetch(url, options);
-    
-    let responseOK = response && response.ok;
-    let nation = []
-    if (responseOK){
-      let resJson = await response.json()
-      let data = resJson.data
-      console.log(response)
-      console.log(data[0])
-      this.setState({data: data, loading: false})
-    }
-  }
-
-  onCancel() {
-    this.TimePicker.close();
-  }
- 
-  onConfirm(hour, minute) {
-    this.setState({ start_time: `${hour}:${minute}` });
-    this.TimePicker.close();
   }
 
   // onRefresh = () => {
@@ -111,7 +97,7 @@ class Explore extends Component {
 
   render() {
     const { navigation } = this.props;
-    const {loading} = this.state;
+    const {loading, schedule} = this.state;
     const browse = navigation.getParam('browse', 'no Browse data');
     return (
       <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
@@ -121,61 +107,15 @@ class Explore extends Component {
           <Text h4>{browse.start_date.slice(0, 10)} ~ {browse.end_date.slice(0, 10)}{"\n"}</Text>
         
         <View style={styles.blo}>
-          <Input
-            style={[styles.input, {width: 130}]}
-            placeholder={"장소/계획"}
-            defaultValue={this.state.title}
-            onChangeText={text => this.setState({ title: text })}
-          />
-          <Text>{"  "}</Text>
-          <TouchableOpacity
-            style={[styles.input, {width: 100, height: 30, marginTop: 15, marginBottom: 36}]}
-            placeholder={"시각"}
-            defaultValue={this.state.start_time}
-            onChangeText={text => this.setState({ start_time: text })}
-            onPress={() => this.TimePicker.open()}            
-            
-          >
-            <TextInput style={{width: 100, marginTop: -9}} placeholder={"시각"} editable = {false}>
-              {this.state.start_time}
-            </TextInput>
-          </TouchableOpacity>
+          
         </View>
-        
-        <Input
-          style={styles.input}
-          placeholder={"상세 계획"}
-          defaultValue={this.state.content}
-          onChangeText={text => this.setState({ content: text })}
-        />
-        <TouchableOpacity
-          onPress={() => this.TimePicker.open()}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Start_time</Text>
-        </TouchableOpacity>
-        <Text style={styles.text}>{this.state.start_time}</Text>
-        <TimePicker
-          ref={ref => {
-            this.TimePicker = ref;
-          }}
-          onCancel={() => this.onCancel()}
-          onConfirm={(hour, minute) => this.onConfirm(hour, minute)}
-        />
           <FlatList
-            data={this.state.data}
+            data={schedule}
             initialNumToRender={20}
             refreshing={this.state.refreshing}
             onRefresh={this.onRefresh}
-            renderItem={({ item }) => {
-              return (
-                <ListItem
-                  roundAvatar
-                  avatar={{uri: item.avatar}}
-                  title={item.name}
-                />
-              );
-            }}
+            renderItem={({ item }) => <Item schedule = {item} />}
+            keyExtractor={item => item.date}
           />
         <Button gradient onPress={() => this.addSchedule()}>
           {loading ?
@@ -281,5 +221,13 @@ const styles = StyleSheet.create({
     height: 80,
     width: 400,
     flexDirection: 'row'
-  }
+  },
+  item: {
+    borderRadius: 10,
+    borderColor: theme.colors.gray2,
+    borderWidth: StyleSheet.hairlineWidth,
+    padding: 20,
+    flex: 1,
+    marginVertical: 8,
+  },
 })
