@@ -10,7 +10,10 @@ import Explore from '../screens/Explore';
 import Browse from '../screens/Browse';
 import Product from '../screens/Product';
 import Settings from '../screens/Settings';
+
+import AddTravel from '../screens/AddTravel';
 import AuthLoading from '../screens/AuthLoading';
+import Receipt from '../screens/Receipt';
 
 
 import { theme } from '../constants';
@@ -25,6 +28,8 @@ const screens = createStackNavigator({
   Browse,
   Product,
   Settings,
+  Receipt,
+  AddTravel,
 }, {
   defaultNavigationOptions: {
     headerStyle: {

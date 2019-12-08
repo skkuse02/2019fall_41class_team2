@@ -65,6 +65,7 @@ class Explore extends Component {
     }
   }
 
+  // CRUD 소켓이벤트 발생 => 서버 수신 => 같은 socket room에 있는 유저에게 broadcast  
 
   handleSearchFocus(status) {
     Animated.timing(
