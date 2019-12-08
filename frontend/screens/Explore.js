@@ -6,6 +6,7 @@ import { Button, Input, Block, Text } from '../components';
 import { theme, mocks } from '../constants';
 import TimePicker from "react-native-24h-timepicker";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+import SearchableDropDown from 'react-native-dropdown-searchable';
 
 const { width, height } = Dimensions.get('window');
 
@@ -24,22 +25,55 @@ class Explore extends Component {
       start_time: '',
       end_time: '',
       date: '',
-      travel_id: 0,
-      city_id: 0
+      city_id: 0,
     //}
+    city: [],
+    tagItem:{
+      tagId: 1,
+      title: 'nothing'
+    }
   };
 
   async componentDidMount(){
     const { navigation } = this.props;
     const browse = navigation.getParam('browse', 'no Browse data');
+    const obj = navigation.getParam('obj', 'no Browse data');
     console.log(browse)
-    this.setState({travel_id: browse.travel_id})
+    console.log(obj)
+    let url = 'http://a10cff1f.ngrok.io/schedule/getCity';
+    
+    let options = {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                  
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
+            };
+    let response = await fetch(url, options);
+    
+    let responseOK = response && response.ok;
+    let city = []
+    if (responseOK){
+      let resJson = await response.json()
+      let data = resJson.data
+      console.log(data[0])
+      for(i = 0; i < data.length ; i++){
+        ////if(i > 0){
+          //if(data[i - 1].name != data[i].name)
+            city.push({'tagId': data[i].city_id, 'title': data[i].name, 'color': '#000000'});
+        //}        
+      }
+      this.setState({city: city})
+    }
+    //this.setState({travel_id: browse.travel_id})
     this.getSchedule();
   }
   
   async getSchedule() {
     console.log("get")
-    let url = 'http://8f752f41.ngrok.io/schedule/getSchedule';
+    let url = 'http://a10cff1f.ngrok.io/schedule/getSchedule';
     
     const { travel_id } = this.state;
     let options = {
@@ -71,7 +105,7 @@ class Explore extends Component {
     const {schedule} = this.state
     console.log("add")
     console.log(schedule)
-    let url = 'http://8f752f41.ngrok.io/schedule/addSchedule';
+    let url = 'http://a10cff1f.ngrok.io/schedule/addSchedule';
     this.setState({ loading: true });
     const { travel_id } = this.state;
     let options = {
@@ -116,16 +150,18 @@ class Explore extends Component {
     const { navigation } = this.props;
     const {loading} = this.state;
     const browse = navigation.getParam('browse', 'no Browse data');
+    console.log(browse.date)
     return (
       <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
         <Block padding={[0, theme.sizes.base * 2]}>
-          <Text h1 bold>{browse.title}</Text>
+          <Text h1 bold>{browse.date}일</Text>
+          {/* <Text h1 bold>{browse.title}</Text>
           <Text h3>{browse.content}</Text>
           <Text h4>{browse.start_date.slice(0, 10)} ~ {browse.end_date.slice(0, 10)}{"\n"}</Text>
-        
+         */}
         <View style={styles.blo}>
           <Input
-            style={[styles.input, {width: 130}]}
+            style={[styles.input, {width: 170}]}
             placeholder={"장소/계획"}
             defaultValue={this.state.title}
             onChangeText={text => this.setState({ title: text })}
@@ -151,13 +187,44 @@ class Explore extends Component {
           defaultValue={this.state.content}
           onChangeText={text => this.setState({ content: text })}
         />
-        <TouchableOpacity
-          onPress={() => this.TimePicker.open()}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>Start_time</Text>
-        </TouchableOpacity>
-        <Text style={styles.text}>{this.state.start_time}</Text>
+        
+          <View style={styles.drop}>
+            <SearchableDropDown
+              style={styles.dropItem}
+              onTextChange={tag => {
+                this.setState({ tag });
+              }}
+              onItemSelect={item => {
+                this.setState({ tagItem: item });
+              }}
+              items={this.state.city}
+              defaultIndex={0}
+              resetValue={false}
+              placeholder={'type something...'}
+              placeholderTextColor={'gray'}
+              underlineColorAndroid="transparent"
+            />
+          </View>
+          <Text>{"    "}</Text>
+          <TouchableOpacity
+            style={[styles.input, {width: 100, height: 30, marginTop: 15, marginBottom: 36}]}
+            placeholder={"시각"}
+            defaultValue={this.state.start_time}
+            onChangeText={text => this.setState({ start_time: text })}
+            onPress={() => this.TimePicker.open()}            
+            
+          >
+            <TextInput style={{width: 100, marginTop: -9}} placeholder={"시각"} editable = {false}>
+              {this.state.start_time}
+            </TextInput>
+          </TouchableOpacity>
+        <Button gradient onPress={() => this.addSchedule()}>
+          {loading ?
+            <ActivityIndicator size="small" color="white" /> : 
+            <Text bold white center>추가하기</Text>
+          }
+        </Button>
+        
         <TimePicker
           ref={ref => {
             this.TimePicker = ref;
@@ -180,12 +247,7 @@ class Explore extends Component {
               );
             }}
           />
-        <Button gradient onPress={() => this.addSchedule()}>
-          {loading ?
-            <ActivityIndicator size="small" color="white" /> : 
-            <Text bold white center>추가하기</Text>
-          }
-        </Button>       
+               
       </Block>
       </KeyboardAwareScrollView>
     )
@@ -246,6 +308,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     marginTop: -20,
   },
+  dropItem:{
+    borderColor: theme.colors.gray2,
+    borderWidth: StyleSheet.hairlineWidth,
+    width: 170,
+    paddingRight: 150,
+    marginRight: 150
+  },
   footer: {
     position: 'absolute',
     bottom: 0,
@@ -263,6 +332,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#fff",
     paddingTop: 100
+  },
+  drop: {
+    flex: 1,
+    justifyContent: 'center',
+    
   },
   text: {
     fontSize: 20,
