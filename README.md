@@ -27,26 +27,24 @@ node.js 후 cmd를 열고
 ```
 npm install expo-cli --global
 npm install  -g ngrok
-
 ```
 expo-cli와 ngrok를 설치한다.
 
 backend로 디렉토리를 이동
-
 ```
+npm install
 npm start
-
 ```
-로 서버를 구동한다.
+으로 서버를 구동한다.
 
 ```
 ngrok http 3000
-
 ```
 으로 서버를 http 포트번호 3000으로 터널링한다
 
 이후 frontend로 디렉토리를 이동 후
 ```
+npm install
 expo start
-
 ```
+으로 frontend 실행한다.
