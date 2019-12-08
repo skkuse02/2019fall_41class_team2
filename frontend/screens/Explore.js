@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
-import { Animated, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { Animated, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, YellowBox, AsyncStorage } from 'react-native'
 import Icon from 'react-native-vector-icons';
 import { LinearGradient } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
 import { theme, mocks } from '../constants';
+import SocketIOClient from 'socket.io-client';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -12,7 +14,57 @@ class Explore extends Component {
   state = { 
     searchFocus: new Animated.Value(0.6),
     searchString: null,
+    socket: null,
+    user: null
   }
+
+  constructor(props){
+    super(props);
+    YellowBox.ignoreWarnings([
+      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
+    ]);
+  }
+
+  async componentDidMount() { 
+    // 사용자 정보(아이디) 값 받아온다.
+    const user = await AsyncStorage.getItem('userToken');
+    this.setState({user: user});
+    // 소켓 room 정보 
+    const name = this.props.navigation.state.params.category.name;
+
+    try{
+      const socket = SocketIOClient('http://115.145.117.252:3000',{
+        // timeout: 10000,
+        // query: name,
+        // jsonp: false,
+        transports: ['websocket'],
+        autoConnect: false,
+        query: { room : name, user : this.state.user },
+        // agent: '-',
+        // path: '/', // Whatever your path is
+        // pfx: '-',
+        // key: '-', // Using token-based auth.
+        // passphrase: '-', // Using cookie auth.
+        // cert: '-',
+        // ca: '-',
+        // ciphers: '-',
+        // rejectUnauthorized: '-',
+        // perMessageDeflate: '-'
+      });  
+      socket.connect(); 
+      socket.on('connect', () => { 
+        console.log('connected to socket server'); 
+        this.setState({socket: socket});
+      }); 
+      socket.on('broadcast', (data) => {
+        console.log(data);
+      })
+
+    }catch{
+      console.log("소켓연결 실패"); 
+    }
+  }
+
 
   handleSearchFocus(status) {
     Animated.timing(

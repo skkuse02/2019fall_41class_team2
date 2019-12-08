@@ -10,8 +10,8 @@ import Explore from '../screens/Explore';
 import Browse from '../screens/Browse';
 import Product from '../screens/Product';
 import Settings from '../screens/Settings';
-
 import AuthLoading from '../screens/AuthLoading';
+
 
 import { theme } from '../constants';
 

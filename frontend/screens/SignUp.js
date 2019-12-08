@@ -43,7 +43,7 @@ export default class SignUp extends Component {
     this.setState({ loading: true });
 
     // check with backend API or with some static data
-    let url = 'http://192.168.0.37:3000/users/signup';
+    let url = 'http://115.145.117.252:3000/users/signup';
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -67,7 +67,7 @@ export default class SignUp extends Component {
 
         if(data.result && !errors.length){
           try {
-            await AsyncStorage.setItem('userToken', 'Logined');
+            await AsyncStorage.setItem('userToken', email);
             Alert.alert(
               '회원가입 성공!',
               'Welcome to Eco-Travel',
@@ -103,7 +103,7 @@ export default class SignUp extends Component {
 
   async idDuplicationCheck(email){
     this.setState({ email: email })
-    let url = 'http://192.168.0.37:3000/users/idDuplicationCheck';
+    let url = 'http://115.145.117.252:3000/users/idDuplicationCheck';
     let options = {
       method: 'POST',
       mode: 'cors',
@@ -130,7 +130,7 @@ export default class SignUp extends Component {
 
   async nicknameDuplicationCheck(nickname){
     this.setState({ nickname: nickname })
-    let url = 'http://192.168.0.37:3000/users/nicknameDuplicationCheck';
+    let url = 'http://115.145.117.252:3000/users/nicknameDuplicationCheck';
     let options = {
       method: 'POST',
       mode: 'cors',

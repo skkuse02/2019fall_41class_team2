@@ -22,7 +22,7 @@ export default class Login extends Component {
     this.setState({ loading: true });
 
     // check with backend API or with some static data
-    let url = 'http://192.168.0.37:3000/users/login';
+    let url = 'http://115.145.117.252:3000/users/login';
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -41,10 +41,9 @@ export default class Login extends Component {
     if (responseOK) {
         let data = await response.json();
         this.setState({ errors, loading: false });
-
         if(data.result && !errors.length){
           try {
-            await AsyncStorage.setItem('userToken', 'Logined');
+            await AsyncStorage.setItem('userToken', email);
             navigate('AuthLoading');
           } catch (error) {
             // Error saving data

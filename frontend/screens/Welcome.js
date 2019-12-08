@@ -1,15 +1,27 @@
 import React, { Component } from 'react'
-import { Animated, Dimensions, Image, FlatList, Modal, StyleSheet, ScrollView } from 'react-native';
+import { Animated, Dimensions, Image, FlatList, Modal, StyleSheet, ScrollView, AsyncStorage } from 'react-native';
 
 import { Button, Block, Text } from '../components';
 import { theme } from '../constants';
 
-import axios from "axios";
-import Gio from 'react-giojs';
-
 const { width, height } = Dimensions.get('window');
 
 class Welcome extends Component {
+  constructor(props){
+    super(props);
+    this._bootstrapAsync();
+  }
+
+  // Fetch the token from storage then navigate to our appropriate place
+  _bootstrapAsync = async () => {
+    const userToken = await AsyncStorage.getItem('userToken');
+    // This will switch to the App screen or Auth screen and this loading
+    // screen will be unmounted and thrown away.
+    if(userToken){
+      this.props.navigation.navigate('Browse');
+    }
+  };
+
   static navigationOptions = {
     header: null,
   }
