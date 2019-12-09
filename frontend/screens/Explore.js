@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Animated, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, YellowBox, AsyncStorage } from 'react-native'
 import Icon from 'react-native-vector-icons';
-import { LinearGradient } from 'expo';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { Button, Input, Block, Text } from '../components';
 import { theme, mocks } from '../constants';

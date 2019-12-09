@@ -16,8 +16,6 @@ class Browse extends Component {
 
   async componentDidMount() {
     this.setState({ categories: this.props.categories });
-    console.log(this.props.categories)
-    console.log(this.props)
     let uid = await AsyncStorage.getItem('uid')
     let url = `http://b87ee120.ngrok.io/travel/getTravel/${uid}`;
     let options = {
@@ -34,13 +32,13 @@ class Browse extends Component {
     //console.log(response.data)
     let responseOK = response && response.ok;
     let travels = []
-    if (responseOK){
+    if (responseOK){  
       let resJson = await response.json()
       let data = resJson.data
       //console.log(response)
-      console.log(data)
+      // console.log(data)
       for(i = 0; i < data.length ; i++){
-        console.log(data[i].Nation.name.toLowerCase())
+        // console.log(data[i].Nation.name.toLowerCase())
         let url = `https://restcountries.eu/rest/v2/name/${data[i].Nation.name.toLowerCase()}`;
         let options = {
                     method: 'GET',
@@ -55,8 +53,8 @@ class Browse extends Component {
         let res = await fetch(url, options);
         let resJ = await res.json()
         let code = resJ[0].alpha2Code.toLowerCase()
-        console.log(code)
-        console.log(`https://www.countryflags.io/${code}/flat/24.png`)
+        // console.log(code)
+        // console.log(`https://www.countryflags.io/${code}/flat/24.png`)
         let travel = {}
         if(data[i].category == 'fri'){
           travel = {
@@ -98,7 +96,7 @@ class Browse extends Component {
         
         travels.push(travel);
       }
-      console.log(travels)
+      // console.log(travels)
       const filtered = travels.filter(
         travel => travel.tags.includes('Family')
       );
@@ -113,7 +111,7 @@ class Browse extends Component {
     // const filtered = categories.filter(
     //   category => category.tags.includes(tab.toLowerCase())
     // );
-    console.log(travels)
+    // console.log(travels)
     const filtered = travels.filter(
       travel => travel.tags.includes(tab)
     );

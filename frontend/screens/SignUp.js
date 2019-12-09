@@ -43,7 +43,7 @@ export default class SignUp extends Component {
     this.setState({ loading: true });
 
     // check with backend API or with some static data
-    let url = 'http://115.145.117.252:3000/users/signup';
+    let url = 'http://115.145.118.37:3000/users/signup';
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -103,7 +103,7 @@ export default class SignUp extends Component {
 
   async idDuplicationCheck(email){
     this.setState({ email: email })
-    let url = 'http://115.145.117.252:3000/users/idDuplicationCheck';
+    let url = 'http://115.145.118.37:3000/users/idDuplicationCheck';
     let options = {
       method: 'POST',
       mode: 'cors',

@@ -22,7 +22,7 @@ export default class Login extends Component {
     this.setState({ loading: true });
 
     // check with backend API or with some static data
-    let url = 'http://115.145.117.252:3000/users/login';
+    let url = 'http://115.145.118.37:3000/users/login';
     let options = {
                 method: 'POST',
                 mode: 'cors',
