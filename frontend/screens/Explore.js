@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { TextInput, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
-import { LinearGradient } from 'expo';
+import { LinearGradient, MapView } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
 import { theme, mocks } from '../constants';
@@ -31,7 +31,14 @@ class Explore extends Component {
     tagItem:{
       tagId: 1,
       title: 'nothing'
-    }
+    },
+    show: false,
+    map: '',
+    initLat: 37.25780000000000,
+    initLon: 127.01090000000000,
+    marLat: 0,
+    marLon: 0,
+    marker: []
   };
 
   async componentDidMount(){
@@ -40,7 +47,7 @@ class Explore extends Component {
     const obj = navigation.getParam('obj', 'no Browse data');
     console.log(browse)
     console.log(obj)
-    let url = 'http://a10cff1f.ngrok.io/schedule/getCity';
+    let url = 'http://163fd06e.ngrok.io/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -62,7 +69,7 @@ class Explore extends Component {
       for(i = 0; i < data.length ; i++){
         ////if(i > 0){
           //if(data[i - 1].name != data[i].name)
-            cities.push({'tagId': data[i].city_id, 'title': data[i].name, 'color': '#000000'});
+            cities.push({'tagId': data[i].city_id, 'title': data[i].name, 'lat': data[i].latitude, 'lon': data[i].longitude});
         //}        
       }
       await this.setState({city: cities})
@@ -73,7 +80,7 @@ class Explore extends Component {
   
   async getSchedule() {
     console.log("get")
-    let url = 'http://a10cff1f.ngrok.io/schedule/getSchedule';
+    let url = 'http://163fd06e.ngrok.io/schedule/getSchedule';
     
     const { travel_id } = this.state;
     let options = {
@@ -102,7 +109,7 @@ class Explore extends Component {
     const {schedule} = this.state
     console.log("add")
     console.log(schedule)
-    let url = 'http://a10cff1f.ngrok.io/schedule/addSchedule';
+    let url = 'http://163fd06e.ngrok.io/schedule/addSchedule';
     this.setState({ loading: true });
     const { travel_id } = this.state;
     let options = {
@@ -142,12 +149,39 @@ class Explore extends Component {
   // onRefresh = () => {
   //   this.getSchedule();
   // }
+  animate(){
+    console.log("anima")
+    let r = {
+        latitude: this.state.initLat,
+        longitude: this.state.initLon,
+        latitudeDelta: 7.5,
+        longitudeDelta: 7.5,
+    };
+    this.mapView.animateToRegion(r, 2000);
+  }
+
+  makeMarker(coor){
+    console.log("coor")
+    console.log(coor)
+    this.setState({marker: [
+      {
+        merchant_name: "Zaky",
+        merchant_type: "Sate",
+        merchant_info: "Selling Sate that is tasty",
+        merchant_phone: "0812909281234",
+        key: 1,
+        location: {
+          latitude: coor.latitude,
+          longitude: coor.longitude,
+        }
+      }
+    ], initLat: coor.latitude, initLon: coor.longitude})
+  }
 
   render() {
     const { navigation } = this.props;
     const {loading} = this.state;
     const browse = navigation.getParam('browse', 'no Browse data');
-    console.log(browse.date)
     return (
       <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
         <Block padding={[0, theme.sizes.base * 2]}>
@@ -191,8 +225,12 @@ class Explore extends Component {
               onTextChange={tag => {
                 this.setState({ tag });
               }}
-              onItemSelect={item => {
+            onItemSelect={item => {
                 this.setState({ tagItem: item });
+                console.log(item);
+                this.setState({ initLat: parseFloat(item.lat)});
+                this.setState({ initLon: parseFloat(item.lon)});
+                this.animate();
               }}
               items={this.state.city}
               defaultIndex={0}
@@ -205,17 +243,61 @@ class Explore extends Component {
           <Text>{"    "}</Text>
           <TouchableOpacity
             style={[styles.input, {width: 100, height: 30, marginTop: 15, marginBottom: 36}]}
-            placeholder={"시각"}
             defaultValue={this.state.start_time}
             onChangeText={text => this.setState({ start_time: text })}
-            onPress={() => this.TimePicker.open()}            
+            onPress={() => this.setState({show: true})}            
             
           >
-            <TextInput style={{width: 100, marginTop: -9}} placeholder={"시각"} editable = {false}>
-              {this.state.start_time}
+            <TextInput style={{width: 100, marginTop: -9}} placeholder={"지도"} editable = {false}>
+              {this.state.map == '저장됨' ?
+                '저장됨':
+                ''
+              }
             </TextInput>
           </TouchableOpacity>
         </View>
+        {this.state.show?
+          <MapView 
+            style={{ flex: 1, height: 300, width: (width - theme.sizes.base * 4)}} 
+            ref = {(ref)=>this.mapView=ref}
+            initialRegion={{ 
+              latitude: this.state.initLat, 
+              longitude: this.state.initLon, 
+              latitudeDelta: 0.0922, 
+              longitudeDelta: 0.0421, 
+            }} 
+            region={{
+              latitude: this.state.initLat, 
+              longitude: this.state.initLon, 
+              latitudeDelta: 0.0922, 
+              longitudeDelta: 0.0421,
+            }}
+            onPress={ (event) => {console.log(event.nativeEvent.coordinate); console.log(this.state.initLat); 
+              this.makeMarker(event.nativeEvent.coordinate); 
+            }}
+            annotations = {
+              {
+                latitude: 37.25780000000000,
+                longitude: 127.01090000000000,
+                title: 'Foo Place',
+                subtitle: '1234 Foo Drive'
+              }
+            }
+          >
+            {this.state.marker.map(marker => (
+                <MapView.Marker
+                    coordinate={marker.location}
+                    title={marker.title}
+                    description={marker.description}
+                    key={marker.key}
+                />
+            ))}
+            
+          </MapView>:
+          <Text></Text>
+        }
+        
+
         <Button gradient onPress={() => this.addSchedule()}>
           {loading ?
             <ActivityIndicator size="small" color="white" /> : 
