@@ -9,6 +9,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "expo": "^33.0.0",
+    "expo-file-system": "^7.0.0",
     "react": "16.8.3",
     "react-giojs": "0.0.5",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
