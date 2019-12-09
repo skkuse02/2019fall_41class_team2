@@ -69,5 +69,39 @@ router.get('/getDateSchedule/:date', wrap(async (req, res) => {
   }
 }))
 
+router.get('/getScheduleById/:id', wrap(async (req, res) => {
+  console.log("get id")
+  const schedule = await models.Schedule.findOne({
+    where: {
+      schedule_id: req.params.id
+    }
+  });
+  if(schedule) {
+    res.send({
+      result: true,
+      data: schedule
+    });
+  } else {
+    res.send({
+      result: false
+    });
+  }
+}))
+
+router.get('/getCity', wrap(async (req, res) => {
+  console.log("get city")
+  const city = await models.City.findAll();
+  if(city) {
+    res.send({
+      result: true,
+      data: city
+    });
+  } else {
+    res.send({
+      result: false
+    });
+  }
+}))
+
 
 module.exports = router;
