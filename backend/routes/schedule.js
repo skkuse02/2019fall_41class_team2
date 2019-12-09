@@ -50,45 +50,45 @@ router.get('/getSchedule/:tid', wrap(async (req, res) => {
   }
 }))
 
-router.get('/getTravel/:uid', wrap(async (req, res) => {
-  const list = await models.User_Travel.findAll({
+router.get('/getDateSchedule/:date', wrap(async (req, res) => {
+  console.log("get da")
+  const schedule = await models.Schedule.findAll({
     where: {
-      user_id: req.params.uid
-    },
-    order: [
-      ['travel_id', 'DESC']
-    ]
+      date: req.params.date
+    }
   });
-  let travels = []
-  if(list){
-    for( let i = 0; i < list.length; i++){
-      const travel = await models.Travel.findOne({
-        where: {
-          travel_id: list[i].travel_id
-        },
-        include: [
-          { model: models.Nation}
-        ]
-      })
-      travels.push(travel)
-    }
-    if(travels) {
-      res.send({
-        result: true,
-        data: travels
-      });
-    } else {
-      res.send({
-        result: false
-      });
-    }
+  if(schedule) {
+    res.send({
+      result: true,
+      data: schedule
+    });
   } else {
     res.send({
-      result: false,
-      data: 'No data'
-    })
+      result: false
+    });
   }
-  
+}))
+
+router.get('/getScheduleById/:id', wrap(async (req, res) => {
+  console.log("get id")
+  const schedule = await models.Schedule.findOne({
+    where: {
+      schedule_id: req.params.id
+    },
+    include: [
+      { model: models.City}
+    ]
+  });
+  if(schedule) {
+    res.send({
+      result: true,
+      data: schedule
+    });
+  } else {
+    res.send({
+      result: false
+    });
+  }
 }))
 
 router.get('/getCity', wrap(async (req, res) => {
@@ -105,5 +105,6 @@ router.get('/getCity', wrap(async (req, res) => {
     });
   }
 }))
+
 
 module.exports = router;

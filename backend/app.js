@@ -9,7 +9,10 @@ var usersRouter = require('./routes/authentication');
 var travelRouter = require('./routes/travel');
 var bodyParser = require('body-parser')
 var scheduleRouter = require('./routes/schedule');
+<<<<<<< HEAD
 var spendRouter = require('./routes/spend');
+=======
+>>>>>>> e86a053876f7d1cb3dd60486e2d40beb440bdfba
 
 var app = express();
 
