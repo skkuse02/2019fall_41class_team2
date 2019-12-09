@@ -74,7 +74,10 @@ router.get('/getScheduleById/:id', wrap(async (req, res) => {
   const schedule = await models.Schedule.findOne({
     where: {
       schedule_id: req.params.id
-    }
+    },
+    include: [
+      { model: models.City}
+    ]
   });
   if(schedule) {
     res.send({
