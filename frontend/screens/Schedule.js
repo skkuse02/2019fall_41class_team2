@@ -10,33 +10,6 @@ import SocketIOClient from 'socket.io-client';
 
 const { width, height } = Dimensions.get('window');
 
-function Itemm({schedule}){
-  console.log("item")
-  //console.log(this.props)
-  //const { navigation } = this.props;
-  return (
-    <View>
-      <TouchableOpacity style={styles.item} onPress={() => this.onSelect()}>
-        <Text>{schedule.date}일</Text>
-        {schedule.sche.length > 0?
-          <Text>{schedule.sche}스케</Text>:
-          <Text>No data</Text>
-        }
-        
-      </TouchableOpacity>
-      
-    </View>
-  );
-}
-
-function Item({ title }) {
-  return (
-    <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
-    </View>
-  );
-}
-
 class Explore extends Component {
   state = {
     refreshing: false,
@@ -141,7 +114,7 @@ class Explore extends Component {
   async getSchedule() {    
     const { travel_id, sday, eday, schedule } = this.state;
     //console.log(this.state)
-    let url = `http://d569c875.ngrok.io/schedule/getSchedule/${travel_id}`
+    let url = `http://59ce2227.ngrok.io/schedule/getSchedule/${travel_id}`
     
     let options = {
                 method: 'GET',
@@ -172,15 +145,6 @@ class Explore extends Component {
     }
   }
 
-  // onRefresh = () => {
-  //   this.getSchedule();
-  // }
-  onSelect(){
-    console.log("select")
-    const { navigation } = this.props;
-    navigation.navigate('Explore', { browse: schedule, travel: browse })
-  }
-
   render() {
     const { navigation } = this.props;
     const {loading, schedule} = this.state;
@@ -197,7 +161,7 @@ class Explore extends Component {
           sections={schedule}
           renderSectionHeader={({ section }) => (
             <View>
-                  <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Explore', { browse: section.title, obj: this.state })}>
+                  <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('DetailSchedule', { browse: browse, obj: section.title })}>
                     
             <Text h3 bold style={styles.SectionHeaderStyle}> {section.title}</Text>
             </TouchableOpacity>
@@ -321,6 +285,6 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     padding: 20,
     flex: 1,
-    marginVertical: 8,
+    marginTop: 25,
   },
 })
