@@ -16,6 +16,8 @@
     "react-giojs": "0.0.5",
     "react-native": "https://github.com/expo/react-native/archive/sdk-33.0.0.tar.gz",
     "react-native-24h-timepicker": "^1.1.0",
+    "react-native-collapsible": "^1.5.1",
+    "react-native-collapsible-list": "^2.0.0",
     "react-native-datepicker": "^1.7.2",
     "react-native-dropdown-searchable": "^1.0.1",
     "react-native-keyboard-aware-scroll-view": "^0.9.1",

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Animated, Dimensions, Image, StyleSheet, ScrollView, YellowBox, AsyncStorag, TextInput, FlatList, View, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Animated, Dimensions, Image, StyleSheet, ScrollView, YellowBox, AsyncStorag, TextInput, FlatList, View, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
 import { LinearGradient, MapView } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
