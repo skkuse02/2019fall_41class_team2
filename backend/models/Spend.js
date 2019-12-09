@@ -35,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   Spend.associate = function (models) {
     Spend.belongsTo(models.Schedule, { foreignKey: { name: 'schedule_id', allowNull: false}});
+    Spend.belongsTo(models.Travel, { foreignKey : { name: 'travel_id', allowNull: false}});
   };
   return Spend;
 };
