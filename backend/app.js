@@ -7,11 +7,8 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/authentication');
 var travelRouter = require('./routes/travel');
-<<<<<<< HEAD
 var bodyParser = require('body-parser')
-=======
 var scheduleRouter = require('./routes/schedule');
->>>>>>> 2296984d6d3465871d6f95802e19cf51bf8e228d
 
 var app = express();
 
