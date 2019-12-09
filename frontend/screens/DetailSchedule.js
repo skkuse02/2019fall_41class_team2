@@ -34,48 +34,6 @@ class Explore extends Component {
 
   async componentDidMount(){
     const { navigation } = this.props;
-
-    console.log("detail")
-
-
-    // 사용자 정보(아이디) 값 받아온다.
-    const user = await AsyncStorage.getItem('userToken');
-    // 소켓 room 정보 
-    const travel_id = navigation.getParam("travel_id", "No Default Value");
-
-    try{
-      const socket = SocketIOClient('http://d569c875.ngrok.io',{
-        // timeout: 10000,
-        // query: name,
-        // jsonp: false,
-        transports: ['websocket'],
-        autoConnect: false,
-        query: { room : travel_id, user : user },
-        // agent: '-',
-        // path: '/', // Whatever your path is
-        // pfx: '-',
-        // key: '-', // Using token-based auth.
-        // passphrase: '-', // Using cookie auth.
-        // cert: '-',
-        // ca: '-',
-        // ciphers: '-',
-        // rejectUnauthorized: '-',
-        // perMessageDeflate: '-'
-      });  
-      socket.connect(); 
-      socket.on('connect', () => { 
-        console.log('connected to socket server'); 
-        
-        this.setState({socket: socket});
-      }); 
-      socket.on('broadcast', (data) => {
-        console.log(data);
-      })
-
-    }catch(e){
-      console.log(e);
-      console.log("소켓연결 실패"); 
-    }
     console.log("detail")
     const browse = navigation.getParam('browse', 'no Browse data');
     console.log(browse)
@@ -143,14 +101,17 @@ class Explore extends Component {
     return (
       <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
         <Block padding={[0, theme.sizes.base * 2]}>
-          <View>
-            <Text h1 bold>{obj} 일정</Text>    
+          <View style={styles.blo}>
+            <Text h1 bold>{obj} 일정       </Text>  
+            <Button gradient onPress={() => navigation.navigate('Explore', {browse: browse, obj: obj})} style={styles.but}>
+              <Text bold white center>+</Text>
+            </Button>  
           </View> 
         <SectionList
           sections={schedule}
           renderSectionHeader={({ section }) => (
             <View>
-                  <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Explore', { browse: browse, obj: section.title })}>
+                  <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('EditSchedule', { browse: browse, obj: obj, sid: section.data[0].schedule_id })}>
                     
             <Text h3 bold style={styles.SectionHeaderStyle}> {section.title}</Text>
             </TouchableOpacity>
@@ -161,17 +122,29 @@ class Explore extends Component {
             // Single Comes here which will be repeatative for the FlatListItems
             <View>
               <Text 
-                style={{marginLeft: 40, fontSize: 15}}
+                style={{marginLeft: 35, fontSize: 17}}
                 //Item Separator View
                 >
                 {item.content}
               </Text>
-              <Text 
-                style={{marginLeft: 40, fontSize: 15}}
+              <View style={styles.blo}>
+              <Text bold
+                style={{marginLeft: 20, fontSize: 17, color: 'red'}}
                 //Item Separator View
                 >
                 예산: {item.budget}원
               </Text>
+              <Text bold
+                style={{marginHorizontal: 20, fontSize: 17, color: 'blue'}}
+                //Item Separator View
+                >
+                지출: {item.budget}원
+              </Text>
+              <TouchableOpacity style={styles.item2} onPress={() => navigation.navigate('Receipt', {browse: browse, obj: obj, travel_id: browse.travel_id, schedule: item})}>
+                    
+              <Text h style={styles.SectionHeaderStyle}>추가</Text>
+              </TouchableOpacity>
+              </View>
             </View>
             
           )}
@@ -275,7 +248,8 @@ const styles = StyleSheet.create({
   blo: {
     height: 80,
     width: 400,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    marginTop: 8
   },
   item: {
     borderRadius: 10,
@@ -283,6 +257,19 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     padding: 20,
     flex: 1,
-    marginTop: 25,
+    marginTop: 10,
+  },
+  item2: {
+    borderRadius: 10,
+    borderColor: theme.colors.gray2,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    height: 30
+  },
+  but: {
+    borderRadius: 70,
+    aspectRatio: 1,
+    height: 33
   },
 })
