@@ -17,7 +17,7 @@ class Browse extends Component {
   async componentDidMount() {
     this.setState({ categories: this.props.categories });
     let uid = await AsyncStorage.getItem('uid')
-    let url = `http://b87ee120.ngrok.io/travel/getTravel/${uid}`;
+    let url = `http://8f752f41.ngrok.io/travel/getTravel/${uid}`;
     let options = {
                 method: 'GET',
                 mode: 'cors',
@@ -171,7 +171,7 @@ class Browse extends Component {
             {now.map(now_each => (
               <TouchableOpacity
                 key={now_each.name}
-                onPress={() => navigation.navigate('Explore', { browse: now_each.data })}
+                onPress={() => navigation.navigate('Schedule', { browse: now_each.data })}
               >
                 <Card center middle shadow style={styles.category}>
                   <Badge margin={[0, 0, 15]} size={60} color="rgba(41,216,143,0.20)">

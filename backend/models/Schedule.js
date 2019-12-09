@@ -43,7 +43,7 @@ module.exports = (sequelize, DataTypes) => {
         comment: '일정 종료 시각'
       },
       date: {
-        type: DataTypes.DATEONLY(),
+        type: DataTypes.DATE(),
         allowNull: false,
         comment: '일정 수행일'
       }
