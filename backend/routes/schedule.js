@@ -9,14 +9,14 @@ router.post('/addSchedule', wrap(async (req, res) => {
   const schedule = await models.Schedule.create({ 
     title: req.body.title,
     content: req.body.content,
-    latitude: req.body.lat,
-    longitude: req.body.lon,
-    budget: req.body.budget,
-    start_time: req.body.start_time,
-    end_time: req.body.end_time,
+    latitude: req.body.marLat,
+    longitude: req.body.marLon,
+    budget: parseFloat(req.body.budget),
+    start_time: req.body.time,
+    end_time: req.body.time,
     date: req.body.date,
-    travel_id: parseInt(req.body.travel),
-    city_id: parseInt(req.body.city)
+    travel_id: parseInt(req.body.travel_id),
+    city_id: parseInt(req.body.city_id)
   });
   
   if(schedule) {
