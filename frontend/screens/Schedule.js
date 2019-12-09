@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import { TextInput, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { TextInput, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
 import { LinearGradient } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
 import { theme, mocks } from '../constants';
 import TimePicker from "react-native-24h-timepicker";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
+import SocketIOClient from 'socket.io-client';
 
 const { width, height } = Dimensions.get('window');
 
@@ -52,13 +53,53 @@ class Explore extends Component {
 
   async componentDidMount(){
     const { navigation } = this.props;
+
+    // 사용자 정보(아이디) 값 받아온다.
+    const user = await AsyncStorage.getItem('userToken');
+    // 소켓 room 정보 
+    const travel_id = navigation.getParam("travel_id", "No Default Value");
+
+    try{
+      const socket = SocketIOClient('http://203.252.34.17:3000',{
+        // timeout: 10000,
+        // query: name,
+        // jsonp: false,
+        transports: ['websocket'],
+        autoConnect: false,
+        query: { room : travel_id, user : user },
+        // agent: '-',
+        // path: '/', // Whatever your path is
+        // pfx: '-',
+        // key: '-', // Using token-based auth.
+        // passphrase: '-', // Using cookie auth.
+        // cert: '-',
+        // ca: '-',
+        // ciphers: '-',
+        // rejectUnauthorized: '-',
+        // perMessageDeflate: '-'
+      });  
+      socket.connect(); 
+      socket.on('connect', () => { 
+        console.log('connected to socket server'); 
+        
+        this.setState({socket: socket});
+      }); 
+      socket.on('broadcast', (data) => {
+        console.log(data);
+      })
+
+    }catch(e){
+      console.log(e);
+      console.log("소켓연결 실패"); 
+    }
+    
     const browse = navigation.getParam('browse', 'no Browse data');
-    console.log(browse)
+    // console.log(browse)
     await this.setState({travel_id: parseInt(browse.travel_id)})
     let sday = parseInt(browse.start_date.slice(8,10))
     let eday = parseInt(browse.end_date.slice(8,10))
     let day = eday - sday + 1
-    console.log(sday, eday, day)
+    // console.log(sday, eday, day)
     let sche = []
     let obj = {}
 

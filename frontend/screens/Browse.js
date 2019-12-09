@@ -17,7 +17,7 @@ class Browse extends Component {
   async componentDidMount() {
     this.setState({ categories: this.props.categories });
     let uid = await AsyncStorage.getItem('uid')
-    let url = `http://8f752f41.ngrok.io/travel/getTravel/${uid}`;
+    let url = `http://203.252.34.17:3000/travel/getTravel/${uid}`;
     let options = {
                 method: 'GET',
                 mode: 'cors',
@@ -26,7 +26,7 @@ class Browse extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json;charset=UTF-8'
                 }
-            };
+            };  
     let response = await fetch(url, options);
     
     //console.log(response.data)
@@ -58,7 +58,7 @@ class Browse extends Component {
         let travel = {}
         if(data[i].category == 'fri'){
           travel = {
-            id: data[i].title,
+            travel_id: data[i].travel_id,
             name: data[i].title,
             tags: ['Friend'],
             content: data[i].content,
@@ -67,7 +67,7 @@ class Browse extends Component {
           }
         } else if (data[i].category == 'fam'){
           travel = {
-            id: data[i].title,
+            travel_id: data[i].travel_id,
             name: data[i].title,
             tags: ['Family'],
             content: data[i].content,
@@ -76,7 +76,7 @@ class Browse extends Component {
           }
         } else if (data[i].category == 'alo'){
           travel = {
-            id: data[i].title,
+            travel_id: data[i].travel_id,
             name: data[i].title,
             tags: ['Alone'],
             content: data[i].content,
@@ -85,7 +85,7 @@ class Browse extends Component {
           }
         } else{
           travel = {
-            id: data[i].title,
+            travel_id: data[i].travel_id,
             name: data[i].title,
             tags: ['Couple'],
             content: data[i].content,
@@ -171,7 +171,7 @@ class Browse extends Component {
             {now.map(now_each => (
               <TouchableOpacity
                 key={now_each.name}
-                onPress={() => navigation.navigate('Schedule', { browse: now_each.data })}
+                onPress={() => navigation.navigate('Schedule', { browse: now_each.data, travel_id: now_each.travel_id })}
               >
                 <Card center middle shadow style={styles.category}>
                   <Badge margin={[0, 0, 15]} size={60} color="rgba(41,216,143,0.20)">

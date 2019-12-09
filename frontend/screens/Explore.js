@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
-import Icon from 'react-native-vector-icons';
-import SocketIOClient from 'socket.io-client';
-
-import { Animated, Dimensions, Image, StyleSheet, ScrollView, YellowBox, AsyncStorag, TextInput, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Animated, Dimensions, Image, StyleSheet, ScrollView, YellowBox, AsyncStorag, TextInput, FlatList, View, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { LinearGradient, MapView } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
@@ -10,6 +7,7 @@ import { theme, mocks } from '../constants';
 import TimePicker from "react-native-24h-timepicker";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import SearchableDropDown from 'react-native-dropdown-searchable';
+import SocketIOClient from 'socket.io-client';
 
 const { width, height } = Dimensions.get('window');
 
@@ -18,67 +16,7 @@ class Explore extends Component {
     searchFocus: new Animated.Value(0.6),
     searchString: null,
     socket: null,
-    user: null
-  }
-
-  constructor(props){
-    super(props);
-    YellowBox.ignoreWarnings([
-      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
-    ]);
-  }
-
-  async componentDidMount() { 
-    // 사용자 정보(아이디) 값 받아온다.
-    const user = await AsyncStorage.getItem('userToken');
-    this.setState({user: user});
-    // 소켓 room 정보 
-    const name = this.props.navigation.state.params.category.name;
-
-    try{
-      const socket = SocketIOClient('http://115.145.117.252:3000',{
-        // timeout: 10000,
-        // query: name,
-        // jsonp: false,
-        transports: ['websocket'],
-        autoConnect: false,
-        query: { room : name, user : this.state.user },
-        // agent: '-',
-        // path: '/', // Whatever your path is
-        // pfx: '-',
-        // key: '-', // Using token-based auth.
-        // passphrase: '-', // Using cookie auth.
-        // cert: '-',
-        // ca: '-',
-        // ciphers: '-',
-        // rejectUnauthorized: '-',
-        // perMessageDeflate: '-'
-      });  
-      socket.connect(); 
-      socket.on('connect', () => { 
-        console.log('connected to socket server'); 
-        this.setState({socket: socket});
-      }); 
-      socket.on('broadcast', (data) => {
-        console.log(data);
-      })
-
-    }catch{
-      console.log("소켓연결 실패"); 
-    }
-  }
-
-  // CRUD 소켓이벤트 발생 => 서버 수신 => 같은 socket room에 있는 유저에게 broadcast  
-
-  handleSearchFocus(status) {
-    Animated.timing(
-      this.state.searchFocus,
-      {
-        toValue: status ? 0.8 : 0.6, // status === true, increase flex size
-        duration: 150, // ms
-      }
-    ).start();
-  state = {
+    user: null,
     refreshing: false,
     loading: false,
     travel_id: '',
@@ -106,15 +44,115 @@ class Explore extends Component {
     marLat: 0,
     marLon: 0,
     marker: []
+  }
+
+  constructor(props){
+    super(props);
+    YellowBox.ignoreWarnings([
+      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
+    ]);
+  }
+
+  // async componentDidMount() { 
+  //   // 사용자 정보(아이디) 값 받아온다.
+  //   const user = await AsyncStorage.getItem('userToken');
+  //   this.setState({user: user});
+  //   // 소켓 room 정보 
+  //   const name = this.props.navigation.state.params.category.name;
+
+  //   try{
+  //     const socket = SocketIOClient('http://115.145.117.252:3000',{
+  //       // timeout: 10000,
+  //       // query: name,
+  //       // jsonp: false,
+  //       transports: ['websocket'],
+  //       autoConnect: false,
+  //       query: { room : name, user : this.state.user },
+  //       // agent: '-',
+  //       // path: '/', // Whatever your path is
+  //       // pfx: '-',
+  //       // key: '-', // Using token-based auth.
+  //       // passphrase: '-', // Using cookie auth.
+  //       // cert: '-',
+  //       // ca: '-',
+  //       // ciphers: '-',
+  //       // rejectUnauthorized: '-',
+  //       // perMessageDeflate: '-'
+  //     });  
+  //     socket.connect(); 
+  //     socket.on('connect', () => { 
+  //       console.log('connected to socket server'); 
+  //       this.setState({socket: socket});
+  //     }); 
+  //     socket.on('broadcast', (data) => {
+  //       console.log(data);
+  //     })
+
+  //   }catch{
+  //     console.log("소켓연결 실패"); 
+  //   }
+  // }
+
+  // CRUD 소켓이벤트 발생 => 서버 수신 => 같은 socket room에 있는 유저에게 broadcast  
+
+  handleSearchFocus(status) {
+    Animated.timing(
+      this.state.searchFocus,
+      {
+        toValue: status ? 0.8 : 0.6, // status === true, increase flex size
+        duration: 150, // ms
+      }
+    ).start();
+      
   };
 
-  async componentDidMount(){
+  componentDidMount = async() => {
     const { navigation } = this.props;
+
+    // 사용자 정보(아이디) 값 받아온다.
+    const user = await AsyncStorage.getItem('userToken');
+    // 소켓 room 정보 
+    const travel_id = navigation.getParam("travel_id", "No Default Value");
+
+    try{
+      const socket = SocketIOClient('http://203.252.34.17:3000',{
+        // timeout: 10000,
+        // query: name,
+        // jsonp: false,
+        transports: ['websocket'],
+        autoConnect: false,
+        query: { room : travel_id, user : user },
+        // agent: '-',
+        // path: '/', // Whatever your path is
+        // pfx: '-',
+        // key: '-', // Using token-based auth.
+        // passphrase: '-', // Using cookie auth.
+        // cert: '-',
+        // ca: '-',
+        // ciphers: '-',
+        // rejectUnauthorized: '-',
+        // perMessageDeflate: '-'
+      });  
+      socket.connect(); 
+      socket.on('connect', () => { 
+        console.log('connected to socket server'); 
+        
+        this.setState({socket: socket});
+      }); 
+      socket.on('broadcast', (data) => {
+        console.log(data);
+      })
+
+    }catch(e){
+      console.log(e);
+      console.log("소켓연결 실패"); 
+    }
+    
     const browse = navigation.getParam('browse', 'no Browse data');
     const obj = navigation.getParam('obj', 'no Browse data');
     console.log(browse)
     console.log(obj)
-    let url = 'http://163fd06e.ngrok.io/schedule/getCity'
+    let url = 'http://203.252.34.17:3000/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -147,7 +185,7 @@ class Explore extends Component {
   
   async getSchedule() {
     console.log("get")
-    let url = 'http://163fd06e.ngrok.io/schedule/getSchedule';
+    let url = 'http://203.252.34.17:3000/schedule/getSchedule';
     
     const { travel_id } = this.state;
     let options = {
@@ -176,7 +214,7 @@ class Explore extends Component {
     const {schedule} = this.state
     console.log("add")
     console.log(schedule)
-    let url = 'http://163fd06e.ngrok.io/schedule/addSchedule';
+    let url = 'http://203.252.34.17:3000/schedule/addSchedule';
     this.setState({ loading: true });
     const { travel_id } = this.state;
     let options = {
@@ -238,36 +276,14 @@ class Explore extends Component {
         merchant_phone: "0812909281234",
         key: 1,
         location: {
-          latitude: coor.latitude,
+          latitude: coor.latitude,  
           longitude: coor.longitude,
         }
       }
     ], initLat: coor.latitude, initLon: coor.longitude})
   }
 
-  renderSearch() {
-    const { searchString, searchFocus } = this.state;
-    const isEditing = searchFocus && searchString;
-
-    return (
-      <Block animated middle flex={searchFocus} style={styles.search}>
-        <Input
-          placeholder="Search"
-          placeholderTextColor={theme.colors.gray2}
-          style={styles.searchInput}
-          onFocus={() => this.handleSearchFocus(true)}
-          onBlur={() => this.handleSearchFocus(false)}
-          onChangeText={text => this.setState({ searchString: text })}
-          value={searchString}
-          onRightPress={() => isEditing ? this.setState({ searchString: null }) : null}
-          rightStyle={styles.searchRight}
-          
-        />
-      </Block>
-    )
-  }
-
-  renderImage(img, index) {
+  render() {
     const { navigation } = this.props;
     const {loading} = this.state;
     const browse = navigation.getParam('browse', 'no Browse data');
