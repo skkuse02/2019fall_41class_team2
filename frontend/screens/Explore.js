@@ -24,9 +24,7 @@ class Explore extends Component {
     //schedule: {
       title: '',
       content: '',
-      latitude: '',
-      longitude: '',
-      budget: 0.0,
+      total_budget: '',
       start_time: '',
       end_time: '',
       date: '',
@@ -41,8 +39,6 @@ class Explore extends Component {
     map: '',
     initLat: 37.25780000000000,
     initLon: 127.01090000000000,
-    marLat: 0,
-    marLon: 0,
     marker: []
   }
 
@@ -151,6 +147,7 @@ class Explore extends Component {
     const browse = navigation.getParam('browse', 'no Browse data');
     const obj = navigation.getParam('obj', 'no Browse data');
     console.log(browse)
+    this.setState({date: browse.date, travel_id: obj.travel_id})
     console.log(obj)
     let url = 'http://203.252.34.17:3000/schedule/getCity'
     
@@ -211,12 +208,13 @@ class Explore extends Component {
   }
 
   async addSchedule() {
-    const {schedule} = this.state
+    const { navigation } = this.props;
+    const browse = navigation.getParam('browse', 'no Browse data');
+    const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
     console.log("add")
     console.log(schedule)
     let url = 'http://203.252.34.17:3000/schedule/addSchedule';
     this.setState({ loading: true });
-    const { travel_id } = this.state;
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -226,19 +224,27 @@ class Explore extends Component {
                     'Content-Type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                  travel_id: travel_id
+                  title: title, 
+                  content: content, 
+                  marLat: marker[0].location.latitude, 
+                  marLon: marker[0].location.longitude, 
+                  budget: total_budget, 
+                  time: start_time,
+                  travel_id: travel_id,
+                  date: date,
+                  city_id: tagItem.tagId
                 })
             };
     let response = await fetch(url, options);
     
     let responseOK = response && response.ok;
-    let nation = []
     if (responseOK){
       let resJson = await response.json()
       let data = resJson.data
       console.log(response)
       console.log(data[0])
       this.setState({data: data, loading: false})
+      navigation.navigate('Schedule', { browse: browse });
     }
   }
 
@@ -251,29 +257,13 @@ class Explore extends Component {
     this.TimePicker.close();
   }
 
-  // onRefresh = () => {
-  //   this.getSchedule();
-  // }
-  animate(){
-    console.log("anima")
-    let r = {
-        latitude: this.state.initLat,
-        longitude: this.state.initLon,
-        latitudeDelta: 7.5,
-        longitudeDelta: 7.5,
-    };
-    this.mapView.animateToRegion(r, 2000);
-  }
-
   makeMarker(coor){
     console.log("coor")
     console.log(coor)
     this.setState({marker: [
       {
-        merchant_name: "Zaky",
-        merchant_type: "Sate",
-        merchant_info: "Selling Sate that is tasty",
-        merchant_phone: "0812909281234",
+        title: '여행 예정지',
+        description: `Here is ${Number((coor.latitude).toFixed(4))}, ${Number((coor.longitude).toFixed(4))}`,
         key: 1,
         location: {
           latitude: coor.latitude,  
@@ -323,6 +313,14 @@ class Explore extends Component {
           defaultValue={this.state.content}
           onChangeText={text => this.setState({ content: text })}
         />
+        <View style={styles.blo}>
+          <Input style={{width: 300}}
+            placeholder={"예산"}
+            defaultValue={this.state.total_budget}
+            onChangeText={text => this.setState({ total_budget: text })}
+          />
+          <Text style={{marginTop: 30, marginLeft: 10}}>원</Text>
+        </View> 
         <View style={styles.blo2}>
           <View style={styles.drop}>
             <SearchableDropDown
@@ -335,7 +333,6 @@ class Explore extends Component {
                 console.log(item);
                 this.setState({ initLat: parseFloat(item.lat)});
                 this.setState({ initLon: parseFloat(item.lon)});
-                this.animate();
               }}
               items={this.state.city}
               defaultIndex={0}
@@ -353,8 +350,7 @@ class Explore extends Component {
             onPress={() => this.setState({show: true})}            
             
           >
-            <Input style={{width: 100, marginTop: -9, height: 40, color: "gray", borderColor: "#C5CCD6",
-    borderWidth: StyleSheet.hairlineWidth, textAlign: 'center'}} editable = {false}>
+            <Input style={styles.mapButton} editable = {false}>
               지도
             </Input>
           </TouchableOpacity>
@@ -544,5 +540,14 @@ const styles = StyleSheet.create({
   },
   blo2: {
     flexDirection: 'row'
+  },
+  mapButton: {
+    width: 100, 
+    marginTop: -9, 
+    height: 40, 
+    color: "gray", 
+    borderColor: "#C5CCD6",
+    borderWidth: StyleSheet.hairlineWidth, 
+    textAlign: 'center'
   }
 })

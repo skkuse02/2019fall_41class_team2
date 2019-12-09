@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { TextInput, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
+import { TextInput, SectionList, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
 import { LinearGradient } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
@@ -10,7 +10,7 @@ import SocketIOClient from 'socket.io-client';
 
 const { width, height } = Dimensions.get('window');
 
-function Item({schedule}){
+function Itemm({schedule}){
   console.log("item")
   //console.log(this.props)
   //const { navigation } = this.props;
@@ -25,6 +25,14 @@ function Item({schedule}){
         
       </TouchableOpacity>
       
+    </View>
+  );
+}
+
+function Item({ title }) {
+  return (
+    <View style={styles.item}>
+      <Text style={styles.title}>{title}</Text>
     </View>
   );
 }
@@ -48,7 +56,7 @@ class Explore extends Component {
     //}
     sday: 0,
     eday: 0,
-    schedule: []
+    schedule: [],
   };
 
   async componentDidMount(){
@@ -102,17 +110,26 @@ class Explore extends Component {
     // console.log(sday, eday, day)
     let sche = []
     let obj = {}
-
+    let arr = browse.start_date
+    let dt = new Date(browse.start_date.slice(0,4), browse.start_date.slice(5,7), browse.start_date.slice(8,10))
+    let dtt = new Date()
+    console.log(dt)
+    console.log(browse.start_date.slice(5,7))
+    
     for(let i = 0; i < day; i++){
       //obj[sday+i] = []
+      //dtt.setDate(dt.getDate()+i)
       sche.push({
-        date: sday+i,
-        sche: []
+        title: `${browse.start_date.slice(0,4)}-${browse.start_date.slice(5,7)}-${parseInt(browse.start_date.slice(8,10))+i}`,
+        data: []
       })
     }
     //sche.push(obj)
+    console.log(sche)
+  
     await this.setState({schedule: sche, sday: sday, eday: eday})
     this.getSchedule();
+    
   }
   
   constructor(props) {
@@ -122,9 +139,9 @@ class Explore extends Component {
   }
 
   async getSchedule() {    
-    const { travel_id, sday, eday } = this.state;
-    console.log(this.state)
-    let url = `http://a10cff1f.ngrok.io/schedule/getSchedule/${travel_id}`;
+    const { travel_id, sday, eday, schedule } = this.state;
+    //console.log(this.state)
+    let url = `http://d569c875.ngrok.io/schedule/getSchedule/${travel_id}`
     
     let options = {
                 method: 'GET',
@@ -142,9 +159,15 @@ class Explore extends Component {
       let resJson = await response.json()
       let data = resJson.data
       console.log(data)
-      for(let i = 0; i < data.length; i++){
-
+      
+      for(let i = 0; i < eday - sday; i++){
+        for(let j = 0; j < data.length; j++){
+          if(schedule[i].title == data[j].date.slice(0,10)){
+            schedule[i].data.push(data[j])
+          }
+        }
       }
+      console.log(schedule)
       this.setState({data: data, loading: false})
     }
   }
@@ -155,7 +178,7 @@ class Explore extends Component {
   onSelect(){
     console.log("select")
     const { navigation } = this.props;
-    navigation.navigate('Explore', { browse: schedule })
+    navigation.navigate('Explore', { browse: schedule, travel: browse })
   }
 
   render() {
@@ -169,32 +192,30 @@ class Explore extends Component {
           <Text h3>{browse.content}</Text>
           <Text h4>{browse.start_date.slice(0, 10)} ~ {browse.end_date.slice(0, 10)}{"\n"}</Text>
         
-        <View style={styles.blo}>
-          
-        </View>
-          <FlatList
-            data={schedule}
-            //initialNumToRender={20}
-            //refreshing={this.state.refreshing}
-            //onRefresh={this.onRefresh}
-            renderItem={({ item }) => {
-              return (
-                <View>
-                  <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Explore', { browse: item, obj: this.state })}>
-                    <Text>{item.date}일</Text>
-                    {item.sche.length > 0?
-                      <Text>{item.sche}스케</Text>:
-                      <Text>No data</Text>
-                    }
+        
+        <SectionList
+          sections={schedule}
+          renderSectionHeader={({ section }) => (
+            <View>
+                  <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('Explore', { browse: section.title, obj: this.state })}>
                     
-                  </TouchableOpacity>
+            <Text h3 bold style={styles.SectionHeaderStyle}> {section.title}</Text>
+            </TouchableOpacity>
                   
                 </View>
-              );
-            }}
-            keyExtractor={item => item.date.toString()}
-            //onPress={()=> navigation.navigate('Explore', { browse: schedule })}
-          />    
+          )}
+          renderItem={({ item }) => (
+            // Single Comes here which will be repeatative for the FlatListItems
+            <Text 
+              style={{marginLeft: 40, fontSize: 15}}
+              //Item Separator View
+              >
+              {item.start_time.slice(0,5)}  {item.title}
+            </Text>
+          )}
+          keyExtractor={(item, index) => index}
+        />
+          
       </Block>
       </KeyboardAwareScrollView>
     )
