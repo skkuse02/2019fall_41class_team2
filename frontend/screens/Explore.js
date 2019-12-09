@@ -242,18 +242,16 @@ class Explore extends Component {
           </View>
           <Text>{"    "}</Text>
           <TouchableOpacity
-            style={[styles.input, {width: 100, height: 30, marginTop: 15, marginBottom: 36}]}
+            style={{width: 100, height: 30, marginTop: 15, marginBottom: 36}}
             defaultValue={this.state.start_time}
             onChangeText={text => this.setState({ start_time: text })}
             onPress={() => this.setState({show: true})}            
             
           >
-            <TextInput style={{width: 100, marginTop: -9}} placeholder={"지도"} editable = {false}>
-              {this.state.map == '저장됨' ?
-                '저장됨':
-                ''
-              }
-            </TextInput>
+            <Input style={{width: 100, marginTop: -9, height: 40, color: "gray", borderColor: "#C5CCD6",
+    borderWidth: StyleSheet.hairlineWidth, textAlign: 'center'}} editable = {false}>
+              지도
+            </Input>
           </TouchableOpacity>
         </View>
         {this.state.show?
