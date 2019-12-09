@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { TextInput, SectionList, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
-import { LinearGradient } from 'expo';
+import { LinearGradient, MapView } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
 import { theme, mocks } from '../constants';
@@ -30,6 +30,10 @@ class Explore extends Component {
     sday: 0,
     eday: 0,
     schedule: [],
+    marker: [],
+    show: false,
+    initLat: 37.25780000000000,
+    initLon: 127.01090000000000,
   };
 
   async componentDidMount(){
@@ -38,7 +42,7 @@ class Explore extends Component {
     const browse = navigation.getParam('browse', 'no Browse data');
     console.log(browse)
     const obj = navigation.getParam('obj', 'no Browse data');
-    this.getSchedule(obj);    
+    this.getSchedule(obj); 
   }
   
   constructor(props) {
@@ -52,7 +56,7 @@ class Explore extends Component {
     const date = obj + 'T00:00:00.000Z'
     console.log(date)
     //console.log(this.state)
-    let url = `http://d569c875.ngrok.io/schedule/getDateSchedule/${date}`
+    let url = `http://59ce2227.ngrok.io/schedule/getDateSchedule/${date}`
     
     let options = {
                 method: 'GET',
@@ -78,9 +82,19 @@ class Explore extends Component {
             data[i]
           ]
         })
+        this.state.marker.push({
+          title: data[i].title,
+          description: data[i].content,
+          key: i+1,
+          location: {
+            latitude: parseFloat(data[i].latitude),  
+            longitude: parseFloat(data[i].longitude),
+          }
+        })
       }
       console.log(schedule)
-      this.setState({data: data, loading: false})
+      console.log(this.state.marker)
+      this.setState({data: data, loading: false, initLat: parseFloat(data[0].latitude), initLon: parseFloat(data[0].longitude)})
     }
   }
 
@@ -93,6 +107,23 @@ class Explore extends Component {
     navigation.navigate('Explore', { browse: schedule, travel: browse })
   }
 
+  makeMarker(coor){
+    console.log(this.state.marker)
+    console.log("coor")
+    console.log(coor)
+    this.setState({marker: [
+      {
+        title: '여행 예정지',
+        description: `Here is ${Number((coor.latitude).toFixed(4))}, ${Number((coor.longitude).toFixed(4))}`,
+        key: 1,
+        location: {
+          latitude: coor.latitude,  
+          longitude: coor.longitude,
+        }
+      }
+    ], initLat: coor.latitude, initLon: coor.longitude})
+  }
+
   render() {
     const { navigation } = this.props;
     const {loading, schedule} = this.state;
@@ -102,11 +133,55 @@ class Explore extends Component {
       <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
         <Block padding={[0, theme.sizes.base * 2]}>
           <View style={styles.blo}>
-            <Text h1 bold>{obj} 일정       </Text>  
+            <Text h1 bold>{obj} 일정    </Text>  
+            <TouchableOpacity style={styles.item1} onPress={() => this.setState({show: true})}>
+              <Text>지도</Text>
+            </TouchableOpacity>
+            <Text>   </Text>
             <Button gradient onPress={() => navigation.navigate('Explore', {browse: browse, obj: obj})} style={styles.but}>
               <Text bold white center>+</Text>
             </Button>  
           </View> 
+          {this.state.show?
+          <MapView 
+            style={{ flex: 1, height: 300, width: (width - theme.sizes.base * 4)}} 
+            ref = {(ref)=>this.mapView=ref}
+            initialRegion={{ 
+              latitude: this.state.initLat, 
+              longitude: this.state.initLon, 
+              latitudeDelta: 0.0922, 
+              longitudeDelta: 0.0421, 
+            }} 
+            region={{
+              latitude: this.state.initLat, 
+              longitude: this.state.initLon, 
+              latitudeDelta: 0.0922, 
+              longitudeDelta: 0.0421,
+            }}
+            onPress={ (event) => {console.log(event.nativeEvent.coordinate); console.log(this.state.initLat); 
+              this.makeMarker(event.nativeEvent.coordinate); 
+            }}
+            annotations = {
+              {
+                latitude: 37.25780000000000,
+                longitude: 127.01090000000000,
+                title: 'Foo Place',
+                subtitle: '1234 Foo Drive'
+              }
+            }
+          >
+            {this.state.marker.map(mark => (
+                <MapView.Marker
+                    coordinate={mark.location}
+                    title={mark.title}
+                    description={mark.description}
+                    key={mark.key}
+                />
+            ))}
+            
+          </MapView>:
+          <Text></Text>
+        }
         <SectionList
           sections={schedule}
           renderSectionHeader={({ section }) => (
@@ -258,6 +333,15 @@ const styles = StyleSheet.create({
     padding: 20,
     flex: 1,
     marginTop: 10,
+  },
+  item1: {
+    borderRadius: 10,
+    borderColor: theme.colors.gray2,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    height: 30,
+    marginTop: 13
   },
   item2: {
     borderRadius: 10,
