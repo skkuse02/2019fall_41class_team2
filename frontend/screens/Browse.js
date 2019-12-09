@@ -12,7 +12,7 @@ class Browse extends Component {
     categories: [],
     travels: [],
     now: []
-  }
+  } 
 
   async componentDidMount() {
     this.setState({ categories: this.props.categories });

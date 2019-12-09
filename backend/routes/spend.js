@@ -26,3 +26,5 @@ router.post('/expenseUpdate', async function(req, res){
     }, { where : { spend_id : req.body.spend_id }});
     res.send({ result: true });
 })
+
+module.exports = router;
