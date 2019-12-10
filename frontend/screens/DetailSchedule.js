@@ -56,7 +56,7 @@ class Explore extends Component {
     const date = obj + 'T00:00:00.000Z'
     console.log(date)
     //console.log(this.state)
-    let url = `http://59ce2227.ngrok.io/schedule/getDateSchedule/${date}`
+    let url = `http://203.252.34.17:3000/schedule/getDateSchedule/${date}`
     
     let options = {
                 method: 'GET',

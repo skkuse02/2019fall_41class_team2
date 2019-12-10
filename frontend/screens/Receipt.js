@@ -15,6 +15,7 @@ export default class Receipt extends Component {
         googleResponse: null,
         spend: [],
         price: [],
+        arr: [],
         clickedText: null,
         textClicked: false,
         loadingText: false,
@@ -88,12 +89,12 @@ export default class Receipt extends Component {
     };
 
     recordSpend = async () => {
-        await this.setState((prevState) => ({spend : [...prevState.spend, this.state.clickedText]}));
+        await this.setState((prevState) => ({spend : [...prevState.spend, this.state.clickedText], textClicked : false}));
         console.log(this.state.spend);
     }   
 
     recordPrice = async () => {
-        await this.setState((prevState) => ({price : [...prevState.price, this.state.clickedText]}));
+        await this.setState((prevState) => ({price : [...prevState.price, this.state.clickedText], textClicked : false}));
         console.log(this.state.price);
     }
 
@@ -110,14 +111,24 @@ export default class Receipt extends Component {
         }
 
         console.log(this.state.clickedText, this.state.textClicked);
-    }   
+    }
+    
+    submitAndNavigate = async () => {
+        const { spend, price } = this.state;
+        const { navigation } = this.props;
+        console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+        const travel_id = navigation.getParam('travel_id', 7);
+        const schedule = navigation.getParam('schedule', null);
+        console.log(spend, price, travel_id, schedule);
+        navigation.navigate('Budget', { spends : spend, price : price, travel_id : travel_id, schedule : schedule })
+    }
 
     render() {
         const { hasCameraPermission, googleResponse, loadingText, textClicked } = this.state;
         if (hasCameraPermission === null) {
-            return <View />;
+            return <View />
         } else if (hasCameraPermission === false) {
-            return <Text>No access to camera</Text>;
+            return <Text>No access to camera</Text>
         } else if(googleResponse){
             // 영수증 인식되었을 경우
             var textArr = this.state.googleResponse.split("\n");
@@ -140,8 +151,9 @@ export default class Receipt extends Component {
                 <ScrollView>
                     <Text h2 center>인식된 텍스트중</Text>
                     <Text h3 center style={{paddingBottom: 20}}>기록할 텍스트를 눌러주세요!</Text>
+                    <Button onPress={this.submitAndNavigate}><Text>완료하기</Text></Button>
                     { textClicked ? selectButton : null }
-                    { myloop }      
+                    { myloop }  
                 </ScrollView>   
             )
         } else if(loadingText){

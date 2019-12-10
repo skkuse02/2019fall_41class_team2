@@ -114,7 +114,7 @@ class Explore extends Component {
   async getSchedule() {    
     const { travel_id, sday, eday, schedule } = this.state;
     //console.log(this.state)
-    let url = `http://59ce2227.ngrok.io/schedule/getSchedule/${travel_id}`
+    let url = `http://203.252.34.17:3000/schedule/getSchedule/${travel_id}`
     
     let options = {
                 method: 'GET',
