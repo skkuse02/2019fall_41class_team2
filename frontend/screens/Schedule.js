@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { TextInput, SectionList, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
+import { TextInput, SectionList, FlatList, View, Dimensions, Image, YellowBox, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
 import { LinearGradient } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
@@ -107,8 +107,9 @@ class Explore extends Component {
   
   constructor(props) {
     super(props);
-
-    console.log(this.props)
+    YellowBox.ignoreWarnings([
+      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
+    ]);
   }
 
   async getSchedule() {    
@@ -281,8 +282,8 @@ const styles = StyleSheet.create({
   },
   item: {
     borderRadius: 10,
-    borderColor: theme.colors.gray2,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.primary,
+    borderWidth: 1.5,
     padding: 20,
     flex: 1,
     marginTop: 25,

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Animated, Dimensions, Image, StyleSheet, ScrollView, YellowBox, AsyncStorag, TextInput, FlatList, View, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Animated, Dimensions, Image, StyleSheet, ScrollView, YellowBox, AsyncStorage, TextInput, FlatList, View, TouchableOpacity, ActivityIndicator } from 'react-native'
 import { LinearGradient, MapView } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
@@ -39,7 +39,8 @@ class Explore extends Component {
     map: '',
     initLat: 37.25780000000000,
     initLon: 127.01090000000000,
-    marker: []
+    marker: [],
+    won: true
   }
 
   constructor(props){
@@ -106,7 +107,7 @@ class Explore extends Component {
     const { navigation } = this.props;
 
     // 사용자 정보(아이디) 값 받아온다.
-    const user = await AsyncStorage.getItem('userToken');
+    const user = await AsyncStorage.getItem('uid');
     // 소켓 room 정보 
     const travel_id = navigation.getParam("travel_id", "No Default Value");
 
@@ -147,9 +148,9 @@ class Explore extends Component {
     const browse = navigation.getParam('browse', 'no Browse data');
     const obj = navigation.getParam('obj', 'no Browse data');
     console.log(browse)
-    this.setState({date: browse.date, travel_id: obj.travel_id})
+    //this.setState({date: browse.date, travel_id: obj.travel_id})
     console.log(obj)
-    let url = 'http://203.252.34.17:3000/schedule/getCity'
+    let url = 'http://59ce2227.ngrok.io/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -182,7 +183,7 @@ class Explore extends Component {
   
   async getSchedule() {
     console.log("get")
-    let url = 'http://203.252.34.17:3000/schedule/getSchedule';
+    let url = 'http://59ce2227.ngrok.io/schedule/getSchedule';
     
     const { travel_id } = this.state;
     let options = {
@@ -210,10 +211,11 @@ class Explore extends Component {
   async addSchedule() {
     const { navigation } = this.props;
     const browse = navigation.getParam('browse', 'no Browse data');
+    const obj = navigation.getParam('obj', 'no Browse data');
+    console.log(browse)
     const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
     console.log("add")
-    console.log(schedule)
-    let url = 'http://203.252.34.17:3000/schedule/addSchedule';
+    let url = 'http://59ce2227.ngrok.io/schedule/addSchedule';
     this.setState({ loading: true });
     let options = {
                 method: 'POST',
@@ -230,8 +232,8 @@ class Explore extends Component {
                   marLon: marker[0].location.longitude, 
                   budget: total_budget, 
                   time: start_time,
-                  travel_id: travel_id,
-                  date: date,
+                  travel_id: browse.travel_id,
+                  date: obj,
                   city_id: tagItem.tagId
                 })
             };
@@ -273,14 +275,49 @@ class Explore extends Component {
     ], initLat: coor.latitude, initLon: coor.longitude})
   }
 
+  async exchange(){
+    console.log("ex")
+    let url = 'https://earthquake.kr:23490/query/USDKRW';
+    
+    let options = {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                  
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
+            };
+    let response = await fetch(url);
+    
+    let responseOK = response && response.ok;
+    let nation = []
+    if (responseOK){
+      let resJson = await response.json()
+      let data = resJson.USDKRW[0]
+      console.log(data)
+      let tmp = 0
+      if(!this.state.won){
+        tmp = parseInt(this.state.total_budget)/data
+      }
+      else{
+        tmp = parseInt(this.state.total_budget)*data;
+      }
+        
+      console.log(tmp)
+      this.setState({total_budget: tmp.toFixed(3).toString(), loading: false})
+    }
+  }
+
   render() {
     const { navigation } = this.props;
     const {loading} = this.state;
     const browse = navigation.getParam('browse', 'no Browse data');
+    const obj = navigation.getParam('obj', 'no Browse data');
     return (
       <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
         <Block padding={[0, theme.sizes.base * 2]}>
-          <Text h1 bold>{browse.date}일</Text>
+          <Text h1 bold>{obj}</Text>
           {/* <Text h1 bold>{browse.title}</Text>
           <Text h3>{browse.content}</Text>
           <Text h4>{browse.start_date.slice(0, 10)} ~ {browse.end_date.slice(0, 10)}{"\n"}</Text>
@@ -314,12 +351,19 @@ class Explore extends Component {
           onChangeText={text => this.setState({ content: text })}
         />
         <View style={styles.blo}>
-          <Input style={{width: 300}}
+          <Input style={{width: 250}}
             placeholder={"예산"}
             defaultValue={this.state.total_budget}
             onChangeText={text => this.setState({ total_budget: text })}
           />
-          <Text style={{marginTop: 30, marginLeft: 10}}>원</Text>
+          { this.state.won ?
+              <TouchableOpacity style={styles.item1} onPress={() => {this.setState({won: false}); this.exchange()}}>
+                <Text>원</Text>
+              </TouchableOpacity>:
+              <TouchableOpacity style={styles.item1} onPress={() => {this.setState({won: true}); this.exchange()}}>
+                <Text>달러</Text>
+              </TouchableOpacity>
+            }
         </View> 
         <View style={styles.blo2}>
           <View style={styles.drop}>
@@ -549,5 +593,15 @@ const styles = StyleSheet.create({
     borderColor: "#C5CCD6",
     borderWidth: StyleSheet.hairlineWidth, 
     textAlign: 'center'
-  }
+  },
+  item1: {
+    borderRadius: 10,
+    borderColor: theme.colors.gray2,
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    height: 44,
+    marginTop: 17,
+    marginLeft: 13
+  },
 })

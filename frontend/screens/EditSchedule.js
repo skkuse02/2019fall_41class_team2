@@ -64,7 +64,7 @@ class EditSchedule extends Component {
   componentDidMount = async() => {
       console.log("edit")    
     
-    let url = 'http://d569c875.ngrok.io/schedule/getCity'
+    let url = 'http://59ce2227.ngrok.io/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -101,7 +101,7 @@ class EditSchedule extends Component {
     const sid = navigation.getParam('sid', 'no Browse data');
     
     console.log(sid)
-    let url = `http://d569c875.ngrok.io/schedule/getScheduleById/${sid}`;
+    let url = `http://59ce2227.ngrok.io/schedule/getScheduleById/${sid}`;
     
     const { travel_id } = this.state;
     let options = {
@@ -152,7 +152,7 @@ class EditSchedule extends Component {
     const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
     console.log("add")
     console.log(schedule)
-    let url = 'http://d569c875.ngrok.io/schedule/editSchedule';
+    let url = 'http://59ce2227.ngrok.io/schedule/editSchedule';
     this.setState({ loading: true });
     let options = {
                 method: 'POST',
