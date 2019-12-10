@@ -32,7 +32,7 @@ class Explore extends Component {
 
   // 원래 있던 Spends 가져오기
   async getSpends(schedule_id) {    
-    let url = `http://203.252.34.17:3000/spend/getSpends/${schedule_id}`
+    let url = `http://43170294.ngrok.io/spend/getSpends/${schedule_id}`
     let options = {
                 method: 'GET',
                 mode: 'cors',
@@ -58,12 +58,12 @@ class Explore extends Component {
   // spend에 새로이 갱신
   async expenseUpdate(){
     const { navigation } = this.props;
-    console.log(spends, price);
+    
     const schedule = navigation.getParam('schedule', null);
     const spends = navigation.getParam('spends', null);
     const price = navigation.getParam('price', null);
-
-    let url = 'http://203.252.34.17:3000/spend/expenseUpdate';
+    console.log(schedule, spends, price);
+    let url = 'http://43170294.ngrok.io/spend/expenseUpdate';
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -118,7 +118,7 @@ class Explore extends Component {
           <Text center h3>스케줄명 : { schedule.title }</Text>
           <Text center h3>스케줄 계획 : { schedule.content }</Text>
             { originalSpends ? originalSpends.map((ori, i) => 
-                { return <View key={i}><Text>지출내역 : {ori.detail}</Text><Text>지출금액 : {ori.expense}</Text></View> }) : null 
+                { return <View key={i}><Text style={{paddingHorizontal: 10}}> {ori.detail} : {ori.expense} </Text></View> }) : null 
             }
             {test}
           <Button gradient onPress={() => this.expenseUpdate()}>

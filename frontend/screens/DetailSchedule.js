@@ -85,6 +85,15 @@ class Explore extends Component {
       console.log("소켓연결 실패"); 
     }
   }
+
+  async componentWillReceiveProps() {
+    const { navigation } = this.props;
+    console.log("detail")
+    const browse = navigation.getParam('browse', 'no Browse data');
+    console.log(browse)
+    const obj = navigation.getParam('obj', 'no Browse data');
+    this.getSchedule(obj);
+  }
   
   constructor(props) {
     super(props);
@@ -99,7 +108,7 @@ class Explore extends Component {
     const date = obj + 'T00:00:00.000Z'
     console.log(date)
     //console.log(this.state)
-    let url = `http://203.252.34.17:3000/schedule/getDateSchedule/${date}`
+    let url = `http://43170294.ngrok.io/schedule/getDateSchedule/${date}`
     
     let options = {
                 method: 'GET',
@@ -265,7 +274,7 @@ class Explore extends Component {
                 style={{marginHorizontal: 20, fontSize: 17, color: 'blue'}}
                 //Item Separator View
                 >
-                지출: {item.budget}원
+                지출: 0원
               </Text>
               <TouchableOpacity style={styles.item2} onPress={() => navigation.navigate('Receipt', {browse: browse, obj: obj, travel_id: browse.travel_id, schedule: item})}>
                     

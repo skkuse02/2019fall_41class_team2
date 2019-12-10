@@ -104,6 +104,43 @@ class Explore extends Component {
     this.getSchedule();
     
   }
+
+  async componentWillReceiveProps() {
+    const { navigation } = this.props;
+
+    // 사용자 정보(아이디) 값 받아온다.
+    const user = await AsyncStorage.getItem('userToken');
+    // 소켓 room 정보 
+    const travel_id = navigation.getParam("travel_id", "No Default Value");
+    const browse = navigation.getParam('browse', 'no Browse data');
+    // console.log(browse)
+    await this.setState({travel_id: parseInt(browse.travel_id)})
+    let sday = parseInt(browse.start_date.slice(8,10))
+    let eday = parseInt(browse.end_date.slice(8,10))
+    let day = eday - sday + 1
+    // console.log(sday, eday, day)
+    let sche = []
+    let obj = {}
+    let arr = browse.start_date
+    let dt = new Date(browse.start_date.slice(0,4), browse.start_date.slice(5,7), browse.start_date.slice(8,10))
+    let dtt = new Date()
+    console.log(dt)
+    console.log(browse.start_date.slice(5,7))
+    
+    for(let i = 0; i < day; i++){
+      //obj[sday+i] = []
+      //dtt.setDate(dt.getDate()+i)
+      sche.push({
+        title: `${browse.start_date.slice(0,4)}-${browse.start_date.slice(5,7)}-${parseInt(browse.start_date.slice(8,10))+i}`,
+        data: []
+      })
+    }
+    //sche.push(obj)
+    console.log(sche)
+  
+    await this.setState({schedule: sche, sday: sday, eday: eday})
+    this.getSchedule();
+  }
   
   constructor(props) {
     super(props);
@@ -115,7 +152,7 @@ class Explore extends Component {
   async getSchedule() {    
     const { travel_id, sday, eday, schedule } = this.state;
     //console.log(this.state)
-    let url = `http://203.252.34.17:3000/schedule/getSchedule/${travel_id}`
+    let url = `http://43170294.ngrok.io/schedule/getSchedule/${travel_id}`
     
     let options = {
                 method: 'GET',
@@ -133,8 +170,8 @@ class Explore extends Component {
       let resJson = await response.json()
       let data = resJson.data
       console.log(data)
-      
-      for(let i = 0; i < eday - sday; i++){
+      console.log(eday - sday)
+      for(let i = 0; i < eday - sday+1; i++){
         for(let j = 0; j < data.length; j++){
           if(schedule[i].title == data[j].date.slice(0,10)){
             schedule[i].data.push(data[j])

@@ -22,7 +22,7 @@ export default class Login extends Component {
     this.setState({ loading: true });
 
     // check with backend API or with some static data
-    let url = 'http://59ce2227.ngrok.io/users/login';
+    let url = 'http://43170294.ngrok.io/users/login';
     let options = {
                 method: 'POST',
                 mode: 'cors',
