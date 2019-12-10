@@ -4,9 +4,9 @@ var router = express.Router();
 const wrap = require('express-async-wrap');
 const models = require('../models');
 
-router.get('/getSpends/:travel_id', async function(req, res){
-    const travel_id = req.params.travel_id;
-    var spends = await models.Spend.findAll({ where : { travel_id : travel_id }});
+router.get('/getSpends/:schedule_id', async function(req, res){
+    const schedule_id = req.params.schedule_id;
+    var spends = await models.Spend.findAll({ where : { schedule_id : schedule_id }});
     if(spends) {
         res.send({
           result: true,
@@ -20,11 +20,22 @@ router.get('/getSpends/:travel_id', async function(req, res){
 })
 
 router.post('/expenseUpdate', async function(req, res){
-    console.log(req.body);
-    await models.Spend.update({
-        expense : req.body.expense
-    }, { where : { spend_id : req.body.spend_id }});
-    res.send({ result: true });
+    var data = (req.body);
+    console.log(data);
+    var detail = data.detail;
+    var expense = data.expense;
+    var schedule_id = data.schedule_id
+
+    for(var i=0;i<detail.length;i++){
+        await models.Spend.create({
+            schedule_id : schedule_id,
+            detail : detail[i],
+            expense : expense[i]
+        })
+        if(i == detail.length-1){
+            res.send({ result: true });
+        }
+    }
 })
 
 module.exports = router;

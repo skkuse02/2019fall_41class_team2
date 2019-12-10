@@ -107,19 +107,5 @@ router.get('/getTravel/:uid', wrap(async (req, res) => {
   
 }))
 
-router.get('/getTourMembers/:id', async function(req, res){
-  const id = req.params.id;
-  var tourMembers = await models.User_Travel.findAll({ where : { travel_id : id }});
-  if(tourMembers) {
-    res.send({
-      result: true,
-      data: travels
-    });
-  } else {
-    res.send({
-      result: false
-    });
-  }
-})
 
 module.exports = router;

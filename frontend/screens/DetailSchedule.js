@@ -34,6 +34,8 @@ class Explore extends Component {
     show: false,
     initLat: 37.25780000000000,
     initLon: 127.01090000000000,
+    socket: null,
+    socketMsg: null
   };
 
   async componentDidMount(){
@@ -43,6 +45,44 @@ class Explore extends Component {
     console.log(browse)
     const obj = navigation.getParam('obj', 'no Browse data');
     this.getSchedule(obj); 
+
+    // 사용자 정보(아이디) 값 받아온다.
+    const email = await AsyncStorage.getItem('uid');
+    // 소켓 room 정보 
+
+    try{
+      const socket = SocketIOClient('http://203.252.34.17:3000',{
+        // timeout: 10000,
+        // query: name,
+        // jsonp: false,
+        transports: ['websocket'],
+        autoConnect: false,
+        query: { room : browse.travel_id, userEmail : email },
+        // agent: '-',
+        // path: '/', // Whatever your path is
+        // pfx: '-',
+        // key: '-', // Using token-based auth.
+        // passphrase: '-', // Using cookie auth.
+        // cert: '-',
+        // ca: '-',
+        // ciphers: '-',
+        // rejectUnauthorized: '-',
+        // perMessageDeflate: '-'
+      });  
+      socket.connect(); 
+      socket.on('connect', () => { 
+        console.log('connected to socket server'); 
+        
+        this.setState({socket: socket});
+      }); 
+      socket.on('broadcast', (data) => {
+        console.log(data);
+      })
+
+    }catch(e){
+      console.log(e);
+      console.log("소켓연결 실패"); 
+    }
   }
   
   constructor(props) {

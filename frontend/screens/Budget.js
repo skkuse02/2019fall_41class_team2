@@ -98,7 +98,7 @@ class Explore extends Component {
 
     var test = [];
     for(var i=0;i<spends.length;i++){
-        test.push(<View>
+        test.push(<View key={i}>
                     <View style={{flex: 2, flexDirection:'row', alignItems: 'center', justifyContent: "space-around"}}>
                         <Text>지출내역 : </Text>
                         <Input defaultValue={" " + spends[i]} onChangeText={text => spends[i] = text}></Input>

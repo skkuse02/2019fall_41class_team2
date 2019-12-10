@@ -39,7 +39,9 @@ class EditSchedule extends Component {
     map: '',
     initLat: 37.25780000000000,
     initLon: 127.01090000000000,
-    marker: []
+    marker: [],
+    socket: null,
+    socketMsg: null
   }
 
   constructor(props){
@@ -64,7 +66,47 @@ class EditSchedule extends Component {
   componentDidMount = async() => {
       console.log("edit")    
     
-    let url = 'http://d569c875.ngrok.io/schedule/getCity'
+    // 사용자 정보(아이디) 값 받아온다.
+    const email = await AsyncStorage.getItem('uid');
+    // 소켓 room 정보 : browse.travel_id
+    const { navigation } = this.props;
+    const browse = navigation.getParam('browse', 'no Browse data');
+
+    try{
+      const socket = SocketIOClient('http://203.252.34.17:3000',{
+        // timeout: 10000,
+        // query: name,
+        // jsonp: false,
+        transports: ['websocket'],
+        autoConnect: false,
+        query: { room : browse.travel_id, userEmail : email },
+        // agent: '-',
+        // path: '/', // Whatever your path is
+        // pfx: '-',
+        // key: '-', // Using token-based auth.
+        // passphrase: '-', // Using cookie auth.
+        // cert: '-',
+        // ca: '-',
+        // ciphers: '-',
+        // rejectUnauthorized: '-',
+        // perMessageDeflate: '-'
+      });  
+      socket.connect(); 
+      socket.on('connect', () => { 
+        console.log('connected to socket server'); 
+        
+        this.setState({socket: socket});
+      }); 
+      socket.on('broadcast', (data) => {
+        console.log(data);
+      })
+
+    }catch(e){
+      console.log(e);
+      console.log("소켓연결 실패"); 
+    }
+
+    let url = 'http://203.252.34.17:3000/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -94,6 +136,8 @@ class EditSchedule extends Component {
     //this.setState({travel_id: browse.travel_id})
     this.getSchedule();
   }
+
+  
   
   async getSchedule() {
     const { navigation } = this.props;
@@ -101,7 +145,7 @@ class EditSchedule extends Component {
     const sid = navigation.getParam('sid', 'no Browse data');
     
     console.log(sid)
-    let url = `http://d569c875.ngrok.io/schedule/getScheduleById/${sid}`;
+    let url = `http://203.252.34.17:3000/schedule/getScheduleById/${sid}`;
     
     const { travel_id } = this.state;
     let options = {
@@ -152,7 +196,7 @@ class EditSchedule extends Component {
     const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
     console.log("add")
     console.log(schedule)
-    let url = 'http://d569c875.ngrok.io/schedule/editSchedule';
+    let url = 'http://203.252.34.17:3000/schedule/editSchedule';
     this.setState({ loading: true });
     let options = {
                 method: 'POST',
@@ -213,6 +257,11 @@ class EditSchedule extends Component {
         }
       }
     ], initLat: coor.latitude, initLon: coor.longitude})
+  }
+
+  _socket_test = async(text) => {
+    socket.to(travel_id).emit(text);
+    this.setState({ title: text });
   }
 
   render() {
