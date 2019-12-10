@@ -17,6 +17,7 @@ import Receipt from '../screens/Receipt';
 import Schedule from '../screens/Schedule';
 import DetailSchedule from '../screens/DetailSchedule';
 import EditSchedule from '../screens/EditSchedule';
+import Budget from '../screens/Budget';
 
 import { theme } from '../constants';
 
@@ -34,7 +35,8 @@ const screens = createStackNavigator({
   AddTravel,
   Schedule,
   DetailSchedule,
-  EditSchedule
+  EditSchedule,
+  Budget
 }, {
   defaultNavigationOptions: {
     headerStyle: {

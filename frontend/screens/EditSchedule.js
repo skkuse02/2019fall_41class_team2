@@ -39,7 +39,9 @@ class EditSchedule extends Component {
     map: '',
     initLat: 37.25780000000000,
     initLon: 127.01090000000000,
-    marker: []
+    marker: [],
+    socket: null,
+    socketMsg: null
   }
 
   constructor(props){
@@ -64,7 +66,7 @@ class EditSchedule extends Component {
   componentDidMount = async() => {
       console.log("edit")    
     
-    let url = 'http://59ce2227.ngrok.io/schedule/getCity'
+    let url = 'http://43170294.ngrok.io/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -94,6 +96,8 @@ class EditSchedule extends Component {
     //this.setState({travel_id: browse.travel_id})
     this.getSchedule();
   }
+
+  
   
   async getSchedule() {
     const { navigation } = this.props;
@@ -101,7 +105,7 @@ class EditSchedule extends Component {
     const sid = navigation.getParam('sid', 'no Browse data');
     
     console.log(sid)
-    let url = `http://59ce2227.ngrok.io/schedule/getScheduleById/${sid}`;
+    let url = `http://43170294.ngrok.io/schedule/getScheduleById/${sid}`;
     
     const { travel_id } = this.state;
     let options = {
@@ -150,9 +154,8 @@ class EditSchedule extends Component {
     const obj = navigation.getParam('obj', 'no Browse data');
     const sid = navigation.getParam('sid', 'no Browse data');
     const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
-    console.log("add")
-    console.log(schedule)
-    let url = 'http://59ce2227.ngrok.io/schedule/editSchedule';
+    console.log("add") 
+    let url = 'http://43170294.ngrok.io/schedule/editSchedule';
     this.setState({ loading: true });
     let options = {
                 method: 'POST',
@@ -213,6 +216,11 @@ class EditSchedule extends Component {
         }
       }
     ], initLat: coor.latitude, initLon: coor.longitude})
+  }
+
+  _socket_test = async(text) => {
+    socket.to(travel_id).emit(text);
+    this.setState({ title: text });
   }
 
   render() {

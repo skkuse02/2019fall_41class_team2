@@ -12,7 +12,7 @@ class Browse extends Component {
     categories: [],
     travels: [],
     now: []
-  }
+  } 
 
   async componentDidMount() {
     this.setState({ categories: this.props.categories });
@@ -29,6 +29,7 @@ class Browse extends Component {
                 }
             };  
     let response = await fetch(url, options);
+
     
     //console.log(response.data)
     let responseOK = response && response.ok;

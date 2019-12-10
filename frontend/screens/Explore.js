@@ -7,7 +7,6 @@ import { theme, mocks } from '../constants';
 import TimePicker from "react-native-24h-timepicker";
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import SearchableDropDown from 'react-native-dropdown-searchable';
-import SocketIOClient from 'socket.io-client';
 
 const { width, height } = Dimensions.get('window');
 
@@ -49,48 +48,6 @@ class Explore extends Component {
       'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?'
     ]);
   }
-
-  // async componentDidMount() { 
-  //   // 사용자 정보(아이디) 값 받아온다.
-  //   const user = await AsyncStorage.getItem('userToken');
-  //   this.setState({user: user});
-  //   // 소켓 room 정보 
-  //   const name = this.props.navigation.state.params.category.name;
-
-  //   try{
-  //     const socket = SocketIOClient('http://115.145.117.252:3000',{
-  //       // timeout: 10000,
-  //       // query: name,
-  //       // jsonp: false,
-  //       transports: ['websocket'],
-  //       autoConnect: false,
-  //       query: { room : name, user : this.state.user },
-  //       // agent: '-',
-  //       // path: '/', // Whatever your path is
-  //       // pfx: '-',
-  //       // key: '-', // Using token-based auth.
-  //       // passphrase: '-', // Using cookie auth.
-  //       // cert: '-',
-  //       // ca: '-',
-  //       // ciphers: '-',
-  //       // rejectUnauthorized: '-',
-  //       // perMessageDeflate: '-'
-  //     });  
-  //     socket.connect(); 
-  //     socket.on('connect', () => { 
-  //       console.log('connected to socket server'); 
-  //       this.setState({socket: socket});
-  //     }); 
-  //     socket.on('broadcast', (data) => {
-  //       console.log(data);
-  //     })
-
-  //   }catch{
-  //     console.log("소켓연결 실패"); 
-  //   }
-  // }
-
-  // CRUD 소켓이벤트 발생 => 서버 수신 => 같은 socket room에 있는 유저에게 broadcast  
 
   handleSearchFocus(status) {
     Animated.timing(
@@ -150,7 +107,7 @@ class Explore extends Component {
     console.log(browse)
     //this.setState({date: browse.date, travel_id: obj.travel_id})
     console.log(obj)
-    let url = 'http://59ce2227.ngrok.io/schedule/getCity'
+    let url = 'http://43170294.ngrok.io/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -183,7 +140,7 @@ class Explore extends Component {
   
   async getSchedule() {
     console.log("get")
-    let url = 'http://59ce2227.ngrok.io/schedule/getSchedule';
+    let url = 'http://43170294.ngrok.io/schedule/getSchedule';
     
     const { travel_id } = this.state;
     let options = {
@@ -215,7 +172,7 @@ class Explore extends Component {
     console.log(browse)
     const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
     console.log("add")
-    let url = 'http://59ce2227.ngrok.io/schedule/addSchedule';
+    let url = 'http://43170294.ngrok.io/schedule/addSchedule';
     this.setState({ loading: true });
     let options = {
                 method: 'POST',

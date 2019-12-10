@@ -36,7 +36,11 @@ router.get('/getSchedule/:tid', wrap(async (req, res) => {
   const schedule = await models.Schedule.findAll({
     where: {
       travel_id: req.params.tid
-    }
+    },
+    order: [
+      ['date', 'ASC'],
+      ['start_time', 'ASC']
+    ]
   });
   if(schedule) {
     res.send({
@@ -50,12 +54,16 @@ router.get('/getSchedule/:tid', wrap(async (req, res) => {
   }
 }))
 
-router.get('/getDateSchedule/:date', wrap(async (req, res) => {
+router.get('/getDateSchedule/:date/:tid', wrap(async (req, res) => {
   console.log("get da")
   const schedule = await models.Schedule.findAll({
     where: {
-      date: req.params.date
-    }
+      date: req.params.date,
+      travel_id: req.params.tid
+    },
+    order: [
+      ['start_time', 'ASC']
+    ]
   });
   if(schedule) {
     res.send({

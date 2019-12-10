@@ -33,6 +33,7 @@ server.on('listening', onListening);
 const io = socket(server); //Initiate Socket
 
 io.on('connection', function(socket){
+  console.log("xxxxxxxxxx");
   if(socket.handshake.query.room){
     let room = socket.handshake.query.room;
     console.log(room);

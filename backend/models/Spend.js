@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     longitude: {
       type: DataTypes.DECIMAL(17,14),
-      allowNull: false,
+      allowNull: true,
       comment: '지출 경도'
     },
     expense: {
@@ -27,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true,
       comment: '지출 금액'
     },
+    currency: {
+      type: DataTypes.STRING,
+      // allowNull: false,
+      comment: '화폐'
+    }
   }, {
     tableName: 'Spend',
     comment: '지출',
