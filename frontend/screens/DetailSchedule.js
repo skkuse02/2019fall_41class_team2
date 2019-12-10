@@ -45,7 +45,7 @@ class Explore extends Component {
     const browse = navigation.getParam('browse', 'no Browse data');
     console.log(browse)
     const obj = navigation.getParam('obj', 'no Browse data');
-    this.getSchedule(obj); 
+    this.getSchedule(browse.travel_id, obj); 
 
     // 사용자 정보(아이디) 값 받아온다.
     const email = await AsyncStorage.getItem('uid');
@@ -92,7 +92,7 @@ class Explore extends Component {
     const browse = navigation.getParam('browse', 'no Browse data');
     console.log(browse)
     const obj = navigation.getParam('obj', 'no Browse data');
-    this.getSchedule(obj);
+    this.getSchedule(browse.travel_id, obj);
   }
   
   constructor(props) {
@@ -103,12 +103,12 @@ class Explore extends Component {
     ]);
   }
 
-  async getSchedule(obj) {    
+  async getSchedule(tid, obj) {    
     const { travel_id, sday, eday, schedule } = this.state;
     const date = obj + 'T00:00:00.000Z'
     console.log(date)
     //console.log(this.state)
-    let url = `http://43170294.ngrok.io/schedule/getDateSchedule/${date}`
+    let url = `http://43170294.ngrok.io/schedule/getDateSchedule/${date}/${tid}`
     
     let options = {
                 method: 'GET',
