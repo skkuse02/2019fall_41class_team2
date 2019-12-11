@@ -56,7 +56,7 @@ router.get('/getSchedule/:tid', wrap(async (req, res) => {
 
 router.get('/getDateSchedule/:date/:tid', wrap(async (req, res) => {
   console.log("get da")
-  const schedule = await models.Schedule.findAll({
+  let schedule = await models.Schedule.findAll({
     where: {
       date: req.params.date,
       travel_id: req.params.tid
@@ -65,7 +65,17 @@ router.get('/getDateSchedule/:date/:tid', wrap(async (req, res) => {
       ['start_time', 'ASC']
     ]
   });
+
   if(schedule) {
+    for ( let i = 0; i < schedule.length; i++){
+      const expense = await models.Spend.findAll({
+        where: {
+          schedule_id: schedule[i].schedule_id
+        }
+      });
+      //schedule[i].push({'expense': expense})
+      schedule[i].dataValues.expense = expense
+    }
     res.send({
       result: true,
       data: schedule
