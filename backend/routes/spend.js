@@ -22,17 +22,17 @@ router.get('/getSpends/:schedule_id', async function(req, res){
 router.post('/expenseUpdate', async function(req, res){
     var data = (req.body);
     console.log(data);
-    var detail = data.detail;
     var expense = data.expense;
     var schedule_id = data.schedule_id
 
-    for(var i=0;i<detail.length;i++){
+    for(var i=0;i<expense.length;i++){
         await models.Spend.create({
             schedule_id : schedule_id,
-            detail : detail[i],
-            expense : expense[i]
+            detail : expense[i].spend,
+            expense : expense[i].price,
+            currency: req.body.currency
         })
-        if(i == detail.length-1){
+        if(i == expense.length-1){
             res.send({ result: true });
         }
     }
