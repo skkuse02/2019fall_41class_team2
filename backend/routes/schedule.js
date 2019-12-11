@@ -114,5 +114,45 @@ router.get('/getCity', wrap(async (req, res) => {
   }
 }))
 
+router.put('/editSchedule/:sid', wrap(async (req, res) => {
+  console.log(req.body)
+  //try{
+    const schedule = await models.Schedule.update({ 
+      title: req.body.title,
+      content: req.body.content,
+      latitude: req.body.marLat,
+      longitude: req.body.marLon,
+      budget: parseFloat(req.body.budget),
+      start_time: req.body.time,
+      end_time: req.body.time,
+      date: req.body.date,
+      travel_id: parseInt(req.body.travel_id),
+      city_id: parseInt(req.body.city_id)
+    },
+    {
+      where: {
+        schedule_id: req.params.sid
+      }
+    });
+  /*} catch(err){
+    console.log(err)
+  }*/
+  
+
+  // console.log(schedule)
+  // console.log(res)
+  
+  if(schedule) {
+    res.send({
+      result: true,
+      data: schedule
+    })
+  } else {
+    res.send({
+      result: false
+    });
+  }
+}));
+
 
 module.exports = router;
