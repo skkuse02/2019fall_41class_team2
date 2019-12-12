@@ -68,7 +68,7 @@ export default class Receipt extends Component {
                 }
             );
             let responseJson = await response.json();
-
+            console.log(responseJson)
             let test = responseJson.responses[0]["fullTextAnnotation"]["text"];
             console.log(test);
             

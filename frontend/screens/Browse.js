@@ -17,7 +17,8 @@ class Browse extends Component {
   async componentDidMount() {
     this.setState({ categories: this.props.categories });
     let uid = await AsyncStorage.getItem('uid')
-    let url = `http://203.252.34.17:3000/travel/getTravel/${uid}`;
+    console.log(uid)
+    let url = `http://43170294.ngrok.io/travel/getTravel/${uid}`;
     let options = {
                 method: 'GET',
                 mode: 'cors',
@@ -38,6 +39,97 @@ class Browse extends Component {
       let data = resJson.data
       //console.log(response)
       // console.log(data)
+      for(i = 0; i < data.length ; i++){
+        // console.log(data[i].Nation.name.toLowerCase())
+        let url = `https://restcountries.eu/rest/v2/name/${data[i].Nation.name.toLowerCase()}`;
+        let options = {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                      
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json;charset=UTF-8',
+                        'fullText': true
+                    }
+                };
+        let res = await fetch(url, options);
+        let resJ = await res.json()
+        let code = resJ[0].alpha2Code.toLowerCase()
+        // console.log(code)
+        // console.log(`https://www.countryflags.io/${code}/flat/24.png`)
+        let travel = {}
+        if(data[i].category == 'fri'){
+          travel = {
+            travel_id: data[i].travel_id,
+            name: data[i].title,
+            tags: ['Friend'],
+            content: data[i].content,
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
+          }
+        } else if (data[i].category == 'fam'){
+          travel = {
+            travel_id: data[i].travel_id,
+            name: data[i].title,
+            tags: ['Family'],
+            content: data[i].content,
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
+          }
+        } else if (data[i].category == 'alo'){
+          travel = {
+            travel_id: data[i].travel_id,
+            name: data[i].title,
+            tags: ['Alone'],
+            content: data[i].content,
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
+          }
+        } else{
+          travel = {
+            travel_id: data[i].travel_id,
+            name: data[i].title,
+            tags: ['Couple'],
+            content: data[i].content,
+            img: `https://www.countryflags.io/${code}/flat/64.png`,
+            data: data[i]
+          }
+        }
+        
+        travels.push(travel);
+      }
+      // console.log(travels)
+      const filtered = travels.filter(
+        travel => travel.tags.includes('Family')
+      );
+
+      this.setState({travels: travels, now: filtered})
+    }
+  }
+
+  async componentWillReceiveProps() {
+    this.setState({ categories: this.props.categories });
+    let uid = await AsyncStorage.getItem('uid')
+    let url = `http://43170294.ngrok.io/travel/getTravel/${uid}`;
+    let options = {
+                method: 'GET',
+                mode: 'cors',
+                headers: {
+                  
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json;charset=UTF-8'
+                }
+            };  
+    let response = await fetch(url, options);
+    
+    //console.log(response.data)
+    let responseOK = response && response.ok;
+    let travels = []
+    if (responseOK){  
+      let resJson = await response.json()
+      let data = resJson.data
+      //console.log(response)
+      console.log(data)
       for(i = 0; i < data.length ; i++){
         // console.log(data[i].Nation.name.toLowerCase())
         let url = `https://restcountries.eu/rest/v2/name/${data[i].Nation.name.toLowerCase()}`;
@@ -148,15 +240,12 @@ class Browse extends Component {
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
-          <Text h1 bold>Browse</Text>
+          <Text h1 bold>Travel</Text>
           <Button onPress={() => navigation.navigate('Settings')}>
             <Image
               source={profile.avatar}
               style={styles.avatar}
             />
-          </Button>
-          <Button onPress={() => navigation.navigate('Receipt')}>
-            <Text>Receipt</Text>
           </Button>
         </Block>
 

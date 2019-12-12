@@ -20,10 +20,13 @@ router.post('/addTravel', wrap(async (req, res) => {
     const ids = req.body.invite.split(',')
     console.log(ids)
     for(let i = 0; i < ids.length; i++){
-      const invite = await models.User_Travel.create({
-        travel_id: travel.travel_id,
-        user_id: ids[i]
-      })
+      if(ids[i] != ''){
+        const invite = await models.User_Travel.create({
+          travel_id: travel.travel_id,
+          user_id: ids[i]
+        })
+      }
+      
     }
     res.send({
       result: true

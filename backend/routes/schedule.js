@@ -36,7 +36,11 @@ router.get('/getSchedule/:tid', wrap(async (req, res) => {
   const schedule = await models.Schedule.findAll({
     where: {
       travel_id: req.params.tid
-    }
+    },
+    order: [
+      ['date', 'ASC'],
+      ['start_time', 'ASC']
+    ]
   });
   if(schedule) {
     res.send({
@@ -50,14 +54,28 @@ router.get('/getSchedule/:tid', wrap(async (req, res) => {
   }
 }))
 
-router.get('/getDateSchedule/:date', wrap(async (req, res) => {
+router.get('/getDateSchedule/:date/:tid', wrap(async (req, res) => {
   console.log("get da")
-  const schedule = await models.Schedule.findAll({
+  let schedule = await models.Schedule.findAll({
     where: {
-      date: req.params.date
-    }
+      date: req.params.date,
+      travel_id: req.params.tid
+    },
+    order: [
+      ['start_time', 'ASC']
+    ]
   });
+
   if(schedule) {
+    for ( let i = 0; i < schedule.length; i++){
+      const expense = await models.Spend.findAll({
+        where: {
+          schedule_id: schedule[i].schedule_id
+        }
+      });
+      //schedule[i].push({'expense': expense})
+      schedule[i].dataValues.expense = expense
+    }
     res.send({
       result: true,
       data: schedule
@@ -105,6 +123,46 @@ router.get('/getCity', wrap(async (req, res) => {
     });
   }
 }))
+
+router.put('/editSchedule/:sid', wrap(async (req, res) => {
+  console.log(req.body)
+  //try{
+    const schedule = await models.Schedule.update({ 
+      title: req.body.title,
+      content: req.body.content,
+      latitude: req.body.marLat,
+      longitude: req.body.marLon,
+      budget: parseFloat(req.body.budget),
+      start_time: req.body.time,
+      end_time: req.body.time,
+      date: req.body.date,
+      travel_id: parseInt(req.body.travel_id),
+      city_id: parseInt(req.body.city_id)
+    },
+    {
+      where: {
+        schedule_id: req.params.sid
+      }
+    });
+  /*} catch(err){
+    console.log(err)
+  }*/
+  
+
+  // console.log(schedule)
+  // console.log(res)
+  
+  if(schedule) {
+    res.send({
+      result: true,
+      data: schedule
+    })
+  } else {
+    res.send({
+      result: false
+    });
+  }
+}));
 
 
 module.exports = router;

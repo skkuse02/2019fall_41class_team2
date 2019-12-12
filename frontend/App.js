@@ -32,6 +32,7 @@ const images = [
 ];
 
 export default class App extends React.Component {
+  
   state = {
     isLoadingComplete: false,
   }
@@ -43,6 +44,7 @@ export default class App extends React.Component {
     const cacheImages = images.map(image => {
       return Asset.fromModule(image).downloadAsync();
     });
+    console.disableYellowBox = true;
 
     return Promise.all(cacheImages);
   }

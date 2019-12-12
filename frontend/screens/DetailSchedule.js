@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { TextInput, SectionList, FlatList, View, Dimensions, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
+import { TextInput, SectionList, FlatList, View, Dimensions, YellowBox, Image, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, AsyncStorage } from 'react-native'
 import { LinearGradient, MapView } from 'expo';
 
 import { Button, Input, Block, Text } from '../components';
@@ -9,6 +9,7 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view'
 import SocketIOClient from 'socket.io-client';
 
 const { width, height } = Dimensions.get('window');
+const markerColor = ['red', 'yellow', 'green', 'blue']
 
 class Explore extends Component {
   state = {
@@ -44,7 +45,7 @@ class Explore extends Component {
     const browse = navigation.getParam('browse', 'no Browse data');
     console.log(browse)
     const obj = navigation.getParam('obj', 'no Browse data');
-    this.getSchedule(obj); 
+    this.getSchedule(browse.travel_id, obj); 
 
     // 사용자 정보(아이디) 값 받아온다.
     const email = await AsyncStorage.getItem('uid');
@@ -84,19 +85,30 @@ class Explore extends Component {
       console.log("소켓연결 실패"); 
     }
   }
+
+  async componentWillReceiveProps() {
+    const { navigation } = this.props;
+    console.log("detail")
+    const browse = navigation.getParam('browse', 'no Browse data');
+    console.log(browse)
+    const obj = navigation.getParam('obj', 'no Browse data');
+    this.getSchedule(browse.travel_id, obj);
+  }
   
   constructor(props) {
     super(props);
+    YellowBox.ignoreWarnings([
+      'Unrecognized WebSocket connection option(s) `agent`, `perMessageDeflate`, `pfx`, `key`, `passphrase`, `cert`, `ca`, `ciphers`, `rejectUnauthorized`. Did you mean to put these under `headers`?',
 
-    console.log(this.props)
+    ]);
   }
 
-  async getSchedule(obj) {    
+  async getSchedule(tid, obj) {    
     const { travel_id, sday, eday, schedule } = this.state;
     const date = obj + 'T00:00:00.000Z'
     console.log(date)
     //console.log(this.state)
-    let url = `http://203.252.34.17:3000/schedule/getDateSchedule/${date}`
+    let url = `http://43170294.ngrok.io/schedule/getDateSchedule/${date}/${tid}`
     
     let options = {
                 method: 'GET',
@@ -134,7 +146,9 @@ class Explore extends Component {
       }
       console.log(schedule)
       console.log(this.state.marker)
-      this.setState({data: data, loading: false, initLat: parseFloat(data[0].latitude), initLon: parseFloat(data[0].longitude)})
+      if(data.length != 0)
+        this.setState({data: data, loading: false, initLat: parseFloat(data[0].latitude), initLon: parseFloat(data[0].longitude)})
+      
     }
   }
 
@@ -174,9 +188,15 @@ class Explore extends Component {
         <Block padding={[0, theme.sizes.base * 2]}>
           <View style={styles.blo}>
             <Text h1 bold>{obj} 일정    </Text>  
-            <TouchableOpacity style={styles.item1} onPress={() => this.setState({show: true})}>
-              <Text>지도</Text>
-            </TouchableOpacity>
+            { !this.state.show ?
+              <TouchableOpacity style={styles.item1} onPress={() => this.setState({show: true})}>
+                <Text>지도</Text>
+              </TouchableOpacity>:
+              <TouchableOpacity style={styles.item1} onPress={() => this.setState({show: false})}>
+                <Text>접기</Text>
+              </TouchableOpacity>
+            }
+            
             <Text>   </Text>
             <Button gradient onPress={() => navigation.navigate('Explore', {browse: browse, obj: obj})} style={styles.but}>
               <Text bold white center>+</Text>
@@ -216,6 +236,7 @@ class Explore extends Component {
                     title={mark.title}
                     description={mark.description}
                     key={mark.key}
+                    pinColor={'#000000'}
                 />
             ))}
             
@@ -243,17 +264,17 @@ class Explore extends Component {
                 {item.content}
               </Text>
               <View style={styles.blo}>
-              <Text bold
+              <Text
                 style={{marginLeft: 20, fontSize: 17, color: 'red'}}
                 //Item Separator View
                 >
                 예산: {item.budget}원
               </Text>
-              <Text bold
+              <Text
                 style={{marginHorizontal: 20, fontSize: 17, color: 'blue'}}
                 //Item Separator View
                 >
-                지출: {item.budget}원
+                지출: 0원
               </Text>
               <TouchableOpacity style={styles.item2} onPress={() => navigation.navigate('Receipt', {browse: browse, obj: obj, travel_id: browse.travel_id, schedule: item})}>
                     
@@ -368,8 +389,8 @@ const styles = StyleSheet.create({
   },
   item: {
     borderRadius: 10,
-    borderColor: theme.colors.gray2,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: theme.colors.primary,
+    borderWidth: 1.5,
     padding: 20,
     flex: 1,
     marginTop: 10,
@@ -381,7 +402,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 10,
     height: 30,
-    marginTop: 13
+    marginTop: 9
   },
   item2: {
     borderRadius: 10,
