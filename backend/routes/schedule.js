@@ -75,6 +75,7 @@ router.get('/getDateSchedule/:date/:tid', wrap(async (req, res) => {
       });
       //schedule[i].push({'expense': expense})
       schedule[i].dataValues.expense = expense
+      schedule[i].dataValues.showExpense = false
     }
     res.send({
       result: true,
