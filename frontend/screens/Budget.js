@@ -28,7 +28,7 @@ class Explore extends Component {
       tagId: 1,
       title: 'nothing'
     },
-    currency: 'KRW',
+    currency: false,
     newSpend:[]
   };
 
@@ -50,7 +50,8 @@ class Explore extends Component {
     for(let i = 0; i < price.length; i++){
       tmp = price[i].replace(/,/gi, '')
       tmp1 = tmp.replace(/ /gi, '')
-      tmp2 = tmp1.replace(/\./gi, '')
+      //tmp2 = tmp1.replace(/\./gi, '')
+      tmp2 = tmp1.replace(/$/gi, '')
       this.state.idx.push(i+1)
       tmpSpend.push({
         'spend': spends[i],
@@ -158,6 +159,9 @@ class Explore extends Component {
       console.log(success);
       
     }
+    const browse = navigation.getParam('browse', 'no browse data');
+    const obj = navigation.getParam('obj', 'no obj data');
+    navigation.navigate('DetailSchedule', {browse: browse, obj: obj})
   }
 
   async exchange() {
@@ -178,10 +182,11 @@ class Explore extends Component {
       let data = resJson[cur][0]
       console.log(data)
       for (let i =0; i<newSpend.length; i++){
-        newSpend[i].price = (newSpend[i].price*data).toFixed(3).toString()
+        newSpend[i].price = (newSpend[i].price*data).toFixed(1).toString()
       } 
       console.log(newSpend)
       this.setState({newSpend})
+      this.setState({currency: true})
     }
   }
 
@@ -214,7 +219,7 @@ class Explore extends Component {
           <Text h3>스케줄명 : { schedule.title }</Text>
           <Text h3>스케줄 계획 : { schedule.content }{"\n"}</Text>
             { originalSpends ? originalSpends.map((ori, i) => 
-                { return <View key={i}><Text style={{paddingHorizontal: 10}}> {ori.detail} : {ori.expense} </Text></View> }) : null 
+                { return <View key={i} style={{flexDirection: 'row'}}><Text style={{paddingHorizontal: 10}}> {ori.detail} : {ori.expense}</Text>{ori.currency != '1'? <Text>{ori.currency}</Text>: null}</View> }) : null 
             }
           <View style={styles.blo}>
           <SearchableDropDown
@@ -223,7 +228,7 @@ class Explore extends Component {
                 this.setState({ tag });
               }}
             onItemSelect={item => {
-                this.setState({ tagItem: item, currency: item.tagId });
+                this.setState({ tagItem: item });
                 console.log(item);
               }}
               items={this.state.prevCur}
@@ -263,6 +268,8 @@ class Explore extends Component {
                         <Input onChangeText={text => {let {newSpend} = this.state; console.log(newSpend[index]); newSpend[index].spend = text; this.setState({newSpend})}} style={styles.item2} defaultValue={this.state.newSpend[index].spend}/>
                         <Text> : </Text>
                     <Input style={styles.item2} onChangeText={text => {let {newSpend} = this.state; newSpend[index].price = text; this.setState({newSpend}); console.log(this.state.newSpend[index])}} defaultValue={item.price}></Input>
+                    {(this.state.tagItem.tagId != '1' && this.state.nextItem.tagId != '1' && this.state.currency)? <Text>{this.state.nextItem.tagId}</Text>: null}
+                    {(this.state.tagItem.tagId != '1' && this.state.nextItem.tagId == '1')? <Text>{this.state.tagItem.tagId}</Text>: null}
                     </View>
                   );
                 }}
@@ -379,7 +386,6 @@ const styles = StyleSheet.create({
   blo: {
     width: 400,
     flexDirection: 'row',
-    justifyContent: 'space-around',
     marginTop: 20
   },
   item: {
@@ -406,11 +412,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderColor: theme.colors.gray2,
     borderWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 15,
+    paddingTop: 10,
+    paddingBottom: 10,
     paddingHorizontal: 20,
-    height: 44,
-    marginTop: 20,
-    marginLeft: 30
+    height: 40,
+    marginTop: 15,
+    marginLeft: 40
   },
   item2: {
     borderRadius: 7,

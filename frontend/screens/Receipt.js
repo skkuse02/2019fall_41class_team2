@@ -68,7 +68,6 @@ export default class Receipt extends Component {
                 }
             );
             let responseJson = await response.json();
-            console.log(responseJson)
             let test = responseJson.responses[0]["fullTextAnnotation"]["text"];
             console.log(test);
             
@@ -101,7 +100,6 @@ export default class Receipt extends Component {
     buttonPop = async (text) => {
         // 만약 prevState.clickedText가 같다면 textClicked를 반대로
         console.log(text);
-        console.log(this.state);
         if(this.state.clickedText == text){
             console.log("xxxxx");
             await this.setState((prevState) => ({textClicked : !prevState.textClicked}));
@@ -119,8 +117,10 @@ export default class Receipt extends Component {
         console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
         const travel_id = navigation.getParam('travel_id', 7);
         const schedule = navigation.getParam('schedule', null);
+        const browse = navigation.getParam('browse', 'no browse data');
+        const obj = navigation.getParam('obj', 'no obj data');
         console.log(spend, price, travel_id, schedule);
-        navigation.navigate('Budget', { spends : spend, price : price, travel_id : travel_id, schedule : schedule })
+        navigation.navigate('Budget', { browse: browse, obj: obj, spends : spend, price : price, travel_id : travel_id, schedule : schedule })
     }
 
     render() {
@@ -133,7 +133,7 @@ export default class Receipt extends Component {
             // 영수증 인식되었을 경우
             var textArr = this.state.googleResponse.split("\n");
             var myloop = [];
-            var selectButton = <View style={{ flex: 4, flexDirection:'row', justifyContent: 'space-around'}}><Button gradient onPress={this.recordSpend} style={{borderRadius: 50, width: 100, alignItems: 'center' }}><Text h1>지출항목</Text></Button><Button gradient onPress={this.recordPrice} style={{borderRadius: 50, width:100, alignItems: 'center'}}><Text h1>금액</Text></Button></View> 
+            var selectButton = <View style={{ flex: 4, flexDirection:'row', justifyContent: 'space-around'}}><Button gradient onPress={this.recordSpend} style={{borderRadius: 50, width: 100, alignItems: 'center' }}><Text h3>지출항목</Text></Button><Button gradient onPress={this.recordPrice} style={{borderRadius: 50, width:100, alignItems: 'center'}}><Text h3>금액</Text></Button></View> 
 
             for (let i = 0; i < textArr.length; i++) {
                 myloop.push(
@@ -151,7 +151,7 @@ export default class Receipt extends Component {
                 <ScrollView>
                     <Text h2 center>인식된 텍스트중</Text>
                     <Text h3 center style={{paddingBottom: 20}}>기록할 텍스트를 눌러주세요!</Text>
-                    <Button onPress={this.submitAndNavigate}><Text>완료하기</Text></Button>
+                    <Button onPress={this.submitAndNavigate} style={{marginLeft: 143, width: 120, borderRadius: 7, borderColor: 'gray', borderWidth: 1, padding: 15}}><Text center style={{fontSize: 17}}>완료하기</Text></Button>
                     { textClicked ? selectButton : null }
                     { myloop }  
                 </ScrollView>   
@@ -160,7 +160,7 @@ export default class Receipt extends Component {
             return <View style={{flex:1, justifyContent:'center', alignItems: 'center'}}><StatusBar hidden={true} /><ActivityIndicator size="large" color="#0000ff" /><Text h3>인식중입니다...</Text><Text h5>잠시만 기다려주세요</Text></View>
         } else {
             console.log(this.state.retry)
-            var retryMsg = this.state.retry ? <View><Text style={{alignSelf: 'center'}}>다시 시도해주세요!</Text></View> : null
+            var retryMsg = this.state.retry ? <View><Text h2 style={{alignSelf: 'center', color: 'white'}} center>다시 시도해주세요!</Text></View> : null
             return (
                 <View style={{ flex: 1 }}>
                     <Camera ref={ref => {

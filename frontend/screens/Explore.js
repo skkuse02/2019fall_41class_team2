@@ -107,7 +107,7 @@ class Explore extends Component {
     console.log(browse)
     //this.setState({date: browse.date, travel_id: obj.travel_id})
     console.log(obj)
-    let url = 'http://43170294.ngrok.io/schedule/getCity'
+    let url = 'http://5862ece5.ngrok.io/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -140,7 +140,7 @@ class Explore extends Component {
   
   async getSchedule() {
     console.log("get")
-    let url = 'http://43170294.ngrok.io/schedule/getSchedule';
+    let url = 'http://5862ece5.ngrok.io/schedule/getSchedule';
     
     const { travel_id } = this.state;
     let options = {
@@ -172,7 +172,7 @@ class Explore extends Component {
     console.log(browse)
     const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
     console.log("add")
-    let url = 'http://43170294.ngrok.io/schedule/addSchedule';
+    let url = 'http://5862ece5.ngrok.io/schedule/addSchedule';
     this.setState({ loading: true });
     let options = {
                 method: 'POST',
@@ -313,14 +313,15 @@ class Explore extends Component {
             defaultValue={this.state.total_budget}
             onChangeText={text => this.setState({ total_budget: text })}
           />
-          { this.state.won ?
+          {/* { this.state.won ?
               <TouchableOpacity style={styles.item1} onPress={() => {this.setState({won: false}); this.exchange()}}>
                 <Text>원</Text>
               </TouchableOpacity>:
               <TouchableOpacity style={styles.item1} onPress={() => {this.setState({won: true}); this.exchange()}}>
                 <Text>달러</Text>
               </TouchableOpacity>
-            }
+            } */}
+          <Text style={styles.item1}>원</Text>
         </View> 
         <View style={styles.blo2}>
           <View style={styles.drop}>
@@ -552,13 +553,8 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   item1: {
-    borderRadius: 10,
-    borderColor: theme.colors.gray2,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingVertical: 15,
-    paddingHorizontal: 20,
     height: 44,
-    marginTop: 17,
+    marginTop: 27,
     marginLeft: 13
   },
 })

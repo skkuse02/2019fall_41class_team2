@@ -36,7 +36,9 @@ class Explore extends Component {
     initLat: 37.25780000000000,
     initLon: 127.01090000000000,
     socket: null,
-    socketMsg: null
+    socketMsg: null,
+    won: true,
+    originalSpends: []
   };
 
   async componentDidMount(){
@@ -104,11 +106,12 @@ class Explore extends Component {
   }
 
   async getSchedule(tid, obj) {    
+    this.setState({schedule: []})
     const { travel_id, sday, eday, schedule } = this.state;
     const date = obj + 'T00:00:00.000Z'
     console.log(date)
     //console.log(this.state)
-    let url = `http://43170294.ngrok.io/schedule/getDateSchedule/${date}/${tid}`
+    let url = `http://5862ece5.ngrok.io/schedule/getDateSchedule/${date}/${tid}`
     
     let options = {
                 method: 'GET',
@@ -125,9 +128,20 @@ class Explore extends Component {
     if (responseOK){
       let resJson = await response.json()
       let data = resJson.data
-      console.log(data)
+      //console.log(data)
       
       for(let i = 0; i < data.length; i++){
+        let sum = 0.0
+        for(let j = 0; j < data[i].expense.length; j++){
+          if(data[i].expense[j].currency != 'KRW'){
+            let exchangeExpense = await this.exchange(data[i].expense[j].currency, data[i].expense[j].expense)
+            sum += parseFloat(exchangeExpense)
+          } else {
+            sum += data[i].expense[j].expense
+          }
+          
+        }
+        data[i].sum = sum.toFixed(1)
         this.state.schedule.push({
           "title": `${data[i].start_time.slice(0,5)}  ${data[i].title}`,
           "data": [
@@ -144,7 +158,7 @@ class Explore extends Component {
           }
         })
       }
-      console.log(schedule)
+      console.log(this.state.schedule)
       console.log(this.state.marker)
       if(data.length != 0)
         this.setState({data: data, loading: false, initLat: parseFloat(data[0].latitude), initLon: parseFloat(data[0].longitude)})
@@ -178,15 +192,41 @@ class Explore extends Component {
     ], initLat: coor.latitude, initLon: coor.longitude})
   }
 
+  async exchange(cur, expense){
+    console.log("Exex")
+    cur += 'KRW'
+    console.log(cur)
+    let url = `https://earthquake.kr:23490/query/${cur}`;
+    
+    let response = await fetch(url);
+    
+    let responseOK = response && response.ok;
+    if (responseOK){
+      let resJson = await response.json()
+      console.log(resJson)
+      let data = resJson[cur][0]
+      console.log(data)
+      console.log(expense)
+      console.log((expense*data).toFixed(1))
+      
+      return (expense*data).toFixed(1)
+        
+      //this.setState({total_budget: tmp.toFixed(3).toString(), loading: false})
+    }
+  }
+
   render() {
     const { navigation } = this.props;
     const {loading, schedule} = this.state;
     const browse = navigation.getParam('browse', 'no Browse data');
     const obj = navigation.getParam('obj', 'no Browse data');
+    const exList = []
+    //for(let i = 0; i < this.)
+
     return (
       <KeyboardAwareScrollView keyboardShouldPersistTaps={'always'} style={{flex:1}} showsVerticalScrollIndicator={false} enableOnAndroid={true}>
         <Block padding={[0, theme.sizes.base * 2]}>
-          <View style={styles.blo}>
+          <View style={styles.bloFirst}>
             <Text h1 bold>{obj} 일정    </Text>  
             { !this.state.show ?
               <TouchableOpacity style={styles.item1} onPress={() => this.setState({show: true})}>
@@ -245,6 +285,7 @@ class Explore extends Component {
         }
         <SectionList
           sections={schedule}
+          extraData={this.state}
           renderSectionHeader={({ section }) => (
             <View>
                   <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('EditSchedule', { browse: browse, obj: obj, sid: section.data[0].schedule_id })}>
@@ -254,7 +295,7 @@ class Explore extends Component {
                   
                 </View>
           )}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             // Single Comes here which will be repeatative for the FlatListItems
             <View>
               <Text 
@@ -270,17 +311,39 @@ class Explore extends Component {
                 >
                 예산: {item.budget}원
               </Text>
-              <Text
-                style={{marginHorizontal: 20, fontSize: 17, color: 'blue'}}
-                //Item Separator View
-                >
-                지출: 0원
-              </Text>
-              <TouchableOpacity style={styles.item2} onPress={() => navigation.navigate('Receipt', {browse: browse, obj: obj, travel_id: browse.travel_id, schedule: item})}>
+              
+              <View style={[styles.blo, {marginBottom: 10}]}>
+                <Text
+                  style={{marginHorizontal: 20, fontSize: 17, color: 'blue'}}
+                  //Item Separator View
+                  >
+                  지출: {item.sum}원
+                </Text>
+                <TouchableOpacity style={[styles.item2, {marginRight: 10}]} onPress={() => {let {schedule} = this.state; console.log(schedule); console.log(index); schedule[1].data[0].showExpense = true; this.setState({schedule});}}>
                     
-              <Text h style={styles.SectionHeaderStyle}>추가</Text>
-              </TouchableOpacity>
+                <Text h style={styles.SectionHeaderStyle}>자세히</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.item2} onPress={() => navigation.navigate('Receipt', {browse: browse, obj: obj, travel_id: browse.travel_id, schedule: item})}>
+                    
+                <Text h style={styles.SectionHeaderStyle}>지출 추가</Text>
+                </TouchableOpacity>
               </View>
+              {item.showExpense?
+                <FlatList
+                data={item.expense}
+                initialNumToRender={20}
+                extraData={this.state}
+                renderItem={({ item, index }) => {
+                  return (                    
+                    <View style={{flex: 2, flexDirection:'row', alignItems: 'center', justifyContent: "space-around", marginTop: 15}}>                        
+                      <Text>
+                        {item.detail} : {item.expense} {item.currency}
+                      </Text>
+                    </View>
+                  );
+                }}
+              />: null
+              }
             </View>
             
           )}
@@ -381,11 +444,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600"
   },
-  blo: {
-    height: 80,
+  bloFirst: {
     width: 400,
     flexDirection: 'row',
-    marginTop: 8
+    marginTop: 10,
+  },
+  blo: {
+    width: 325,
+    flexDirection: 'row',
+    marginTop: 10,    
+    justifyContent: 'space-between'
   },
   item: {
     borderRadius: 10,
@@ -410,7 +478,9 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    height: 30
+    height: 30,
+    alignSelf: 'flex-end',
+    marginRight: 0
   },
   but: {
     borderRadius: 70,

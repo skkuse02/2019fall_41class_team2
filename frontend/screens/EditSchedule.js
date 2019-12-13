@@ -66,7 +66,7 @@ class EditSchedule extends Component {
   componentDidMount = async() => {
       console.log("edit")    
     
-    let url = 'http://43170294.ngrok.io/schedule/getCity'
+    let url = 'http://5862ece5.ngrok.io/schedule/getCity'
     
     let options = {
                 method: 'GET',
@@ -105,7 +105,7 @@ class EditSchedule extends Component {
     const sid = navigation.getParam('sid', 'no Browse data');
     
     console.log(sid)
-    let url = `http://43170294.ngrok.io/schedule/getScheduleById/${sid}`;
+    let url = `http://5862ece5.ngrok.io/schedule/getScheduleById/${sid}`;
     
     const { travel_id } = this.state;
     let options = {
@@ -148,17 +148,18 @@ class EditSchedule extends Component {
     }
   }
 
-  async addSchedule() {
+  async editSchedule() {
     const { navigation } = this.props;
     const browse = navigation.getParam('browse', 'no Browse data');
     const obj = navigation.getParam('obj', 'no Browse data');
     const sid = navigation.getParam('sid', 'no Browse data');
     const {title, content, total_budget, start_time, travel_id, tagItem, date, marker} = this.state
     console.log("add") 
-    let url = 'http://43170294.ngrok.io/schedule/editSchedule';
+    console.log(sid)
+    let url = `http://5862ece5.ngrok.io/schedule/editSchedule/${sid}`;
     this.setState({ loading: true });
     let options = {
-                method: 'POST',
+                method: 'PUT',
                 mode: 'cors',
                 headers: {
                   
@@ -170,10 +171,10 @@ class EditSchedule extends Component {
                   content: content, 
                   marLat: marker[0].location.latitude, 
                   marLon: marker[0].location.longitude, 
-                  budget: total_budget, 
-                  time: start_time,
+                  budget: parseFloat(total_budget), 
+                  time: start_time+':00',
                   travel_id: travel_id,
-                  date: browse,
+                  date: obj,
                   city_id: tagItem.tagId
                 })
             };
@@ -347,7 +348,7 @@ class EditSchedule extends Component {
         }
         
 
-        <Button gradient onPress={() => this.addSchedule()}>
+        <Button gradient onPress={() => this.editSchedule()}>
           {loading ?
             <ActivityIndicator size="small" color="white" /> : 
             <Text bold white center>수정하기</Text>
@@ -360,23 +361,7 @@ class EditSchedule extends Component {
           }}
           onCancel={() => this.onCancel()}
           onConfirm={(hour, minute) => this.onConfirm(hour, minute)}
-        />
-          <FlatList
-            data={this.state.data}
-            initialNumToRender={20}
-            refreshing={this.state.refreshing}
-            onRefresh={this.onRefresh}
-            renderItem={({ item }) => {
-              return (
-                <ListItem
-                  roundAvatar
-                  avatar={{uri: item.avatar}}
-                  title={item.name}
-                />
-              );
-            }}
-          />
-               
+        />               
       </Block>
       </KeyboardAwareScrollView>
     )
