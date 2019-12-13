@@ -30,7 +30,7 @@ class Browse extends Component {
     const errors = [];
     let uid = await AsyncStorage.getItem('uid')
     let tmp = invite +',' + uid
-    let url = 'http://43170294.ngrok.io/travel/addTravel';
+    let url = 'http://5862ece5.ngrok.io/travel/addTravel';
     let options = {
                 method: 'POST',
                 mode: 'cors',
@@ -95,7 +95,7 @@ class Browse extends Component {
   }
 
   async componentDidMount() {
-    let url = 'http://43170294.ngrok.io/travel/getNation';
+    let url = 'http://5862ece5.ngrok.io/travel/getNation';
     let options = {
                 method: 'GET',
                 mode: 'cors',
