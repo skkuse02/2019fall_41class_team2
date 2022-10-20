@@ -9,7 +9,7 @@
   "dependencies": {
     "@google-cloud/vision": "^1.7.2",
     "axios": "^0.19.0",
-    "expo": "^33.0.0",
+    "expo": "^46.0.16",
     "expo-camera": "^7.0.0",
     "expo-file-system": "^7.0.0",
     "react": "16.8.3",
